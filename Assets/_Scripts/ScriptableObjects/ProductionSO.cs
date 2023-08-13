@@ -9,6 +9,6 @@ namespace _Scripts.ScriptableObjects
         [field: SerializeField] public float ProductionRate { get; private set; }
         [field: SerializeField] public long ProductionCount { get; private set; }
         [field: SerializeField] public Sprite Sprite { get; private set; }
-        [field: SerializeField] public ResourceSO ProductionResourceType { get; private set; }
+        [field: SerializeField] public ResourceSO ProductionResource { get; private set; }
     }
 }

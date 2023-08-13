@@ -47,10 +47,13 @@ namespace _Scripts
 
         private void AddResourceToRepository()
         {
-            var productionResourceType = _productionSO.ProductionResourceType;
+            var productionResource = _productionSO.ProductionResource;
+            var connectedResource = _productionSO.ConnectedResource;
+            
             var productionCount = _productionSO.ProductionCount * 
-                                  ResourcesRepository.Instance.GetResource(productionResourceType).Count;
-            ResourcesRepository.Instance.IncreaseResourceCount(productionResourceType, productionCount);
+                                  ResourcesRepository.Instance.GetResource(connectedResource).Count;
+            
+            ResourcesRepository.Instance.IncreaseResourceCount(productionResource, productionCount);
         }
 
         private enum State
