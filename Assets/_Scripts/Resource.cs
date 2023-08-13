@@ -1,44 +1,34 @@
 ﻿using System;
 using System.Numerics;
-using _Scripts.Enums;
 using _Scripts.ScriptableObjects;
 
 namespace _Scripts
 {
-    public class Resource
+   public class Resource
     {
-        public ResourceType Type => _resourceSO.Type;
-        private BigInteger _count;
         private ResourceSO _resourceSO;
+        private BigInteger _count;
 
-        public float ProductionRate { get; private set; }
-        public BigInteger ProductionCount { get; private set; }
-        public ResourceSO SO => _resourceSO;
-        public BigInteger Count => _count;
+        public event Action OnCountChanged;
 
-        public ResourceProducer Producer { get; private set; }
+        public ResourceSO ResourceSO
+        {
+            get => _resourceSO;
+        }
+
+        public BigInteger Count
+        {
+            get => _count;
+            set
+            {
+                _count = value;
+                OnCountChanged?.Invoke();
+            }
+        }
 
         public Resource(ResourceSO resourceSO)
         {
             _resourceSO = resourceSO;
-            Producer = new ResourceProducer(this, _resourceSO.ProductionResourceType);
-            
-            Init();
-        }
-        
-        public event Action OnCountChanged;
-
-        public void Init()
-        {
-            ProductionRate = 2;
-            ProductionCount = 3;
-            _count = 1;
-        }
-
-        public void IncreaseCount(BigInteger value)
-        {
-            _count += value;
-            OnCountChanged?.Invoke();
         }
     }
 }

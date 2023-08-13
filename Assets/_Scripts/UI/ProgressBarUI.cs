@@ -1,11 +1,10 @@
-﻿using System;
-using DG.Tweening;
+﻿using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Scripts
+namespace _Scripts.UI
 {
     public class ProgressBarUI : MonoBehaviour
     {

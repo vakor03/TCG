@@ -799,6 +799,7 @@ MonoBehaviour:
   productionCount: {fileID: 7295761677835349420}
   countText: {fileID: 7384536260363128876}
   buyButton: {fileID: 4018172066721841275}
+  buyButtonText: {fileID: 3052832966585981501}
   progressBarUI: {fileID: 1434640135372801809}
 --- !u!1001 &8589128046236400257
 PrefabInstance:

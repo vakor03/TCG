@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using _Scripts.Enums;
-using _Scripts.Managers;
+using _Scripts.Repositories;
+using _Scripts.ScriptableObjects;
 using MEC;
-using UnityEngine;
 
 namespace _Scripts
 {
-    public class ResourceProducer
+    public class Production
     {
         public event Action OnProductionFinished;
         public event Action OnProductionStarted;
@@ -15,14 +14,12 @@ namespace _Scripts
         public bool AutoProduction { get; private set; }
 
         private State _currentState;
-        private Resource _resource;
-        private ResourceType _productionResource;
-
-        public ResourceProducer(Resource resource, ResourceType productionResource)
+        private ProductionSO _productionSO;
+        
+        public Production(ProductionSO productionSO)
         {
-            _resource = resource;
             _currentState = State.Stopped;
-            _productionResource = productionResource;
+            _productionSO = productionSO;
         }
 
         public void StartProduction()
@@ -40,7 +37,7 @@ namespace _Scripts
             _currentState = State.Production;
             OnProductionStarted?.Invoke();
 
-            yield return Timing.WaitForSeconds(_resource.ProductionRate);
+            yield return Timing.WaitForSeconds(_productionSO.ProductionRate);
 
             AddResourceToRepository();
             
@@ -50,8 +47,10 @@ namespace _Scripts
 
         private void AddResourceToRepository()
         {
-            var productionCount = _resource.ProductionCount * _resource.Count;
-            ResourcesRepository.Instance.IncreaseResourceCount(_productionResource, productionCount);
+            var productionResourceType = _productionSO.ProductionResourceType;
+            var productionCount = _productionSO.ProductionCount * 
+                                  ResourcesRepository.Instance.GetResourceInfo(productionResourceType).Count;
+            ResourcesRepository.Instance.IncreaseResourceCount(productionResourceType, productionCount);
         }
 
         private enum State
