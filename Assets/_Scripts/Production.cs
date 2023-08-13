@@ -49,7 +49,7 @@ namespace _Scripts
         {
             var productionResourceType = _productionSO.ProductionResourceType;
             var productionCount = _productionSO.ProductionCount * 
-                                  ResourcesRepository.Instance.GetResourceInfo(productionResourceType).Count;
+                                  ResourcesRepository.Instance.GetResource(productionResourceType).Count;
             ResourcesRepository.Instance.IncreaseResourceCount(productionResourceType, productionCount);
         }
 

@@ -26,7 +26,7 @@ namespace _Scripts.UI
         private void Start()
         {
             _production = ProductionsRepository.Instance.GetResourceProducer(productionSO);
-            _connectedResource = ResourcesRepository.Instance.GetResourceInfo(productionSO.ConnectedResource);
+            _connectedResource = ResourcesRepository.Instance.GetResource(productionSO.ConnectedResource);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _connectedResource.OnCountChanged += TargetResourceOnCountChanged;

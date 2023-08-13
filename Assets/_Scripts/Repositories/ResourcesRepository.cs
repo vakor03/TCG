@@ -26,7 +26,7 @@ namespace _Scripts.Repositories
             _resourcesMap = _resourceSOs.ToDictionary(so => so, so => new Resource(so));
         }
 
-        public Resource GetResourceInfo(ResourceSO resourceSO)
+        public Resource GetResource(ResourceSO resourceSO)
         {
             return _resourcesMap[resourceSO];
         }
