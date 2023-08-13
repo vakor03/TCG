@@ -797,6 +797,7 @@ MonoBehaviour:
   image: {fileID: 4204962876176706748}
   productionRate: {fileID: 1044904975482136889}
   productionCount: {fileID: 7295761677835349420}
+  countText: {fileID: 7384536260363128876}
   buyButton: {fileID: 4018172066721841275}
   progressBarUI: {fileID: 1434640135372801809}
 --- !u!1001 &8589128046236400257

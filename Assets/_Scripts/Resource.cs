@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using _Scripts.Enums;
 using _Scripts.ScriptableObjects;
 
@@ -24,6 +25,8 @@ namespace _Scripts
             
             Init();
         }
+        
+        public event Action OnCountChanged;
 
         public void Init()
         {
@@ -35,6 +38,7 @@ namespace _Scripts
         public void IncreaseCount(BigInteger value)
         {
             _count += value;
+            OnCountChanged?.Invoke();
         }
     }
 }

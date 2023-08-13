@@ -40,10 +40,10 @@ namespace _Scripts
             _currentState = State.Production;
             OnProductionStarted?.Invoke();
 
-            Debug.Log(_resource.ProductionRate);
             yield return Timing.WaitForSeconds(_resource.ProductionRate);
 
             AddResourceToRepository();
+            
             OnProductionFinished?.Invoke();
             _currentState = State.Stopped;
         }
