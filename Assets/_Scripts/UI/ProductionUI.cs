@@ -1,4 +1,5 @@
-﻿using _Scripts.Repositories;
+﻿using _Scripts.Helpers;
+using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
@@ -44,7 +45,7 @@ namespace _Scripts.UI
 
         private void TargetResourceOnCountChanged()
         {
-            countText.text = _connectedResource.Count.ToString();
+            countText.text = _connectedResource.Count.ToScientificNotationString();
         }
 
         private void SetDefaultValues()

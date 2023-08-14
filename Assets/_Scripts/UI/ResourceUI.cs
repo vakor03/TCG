@@ -1,4 +1,5 @@
-﻿using _Scripts.Repositories;
+﻿using _Scripts.Helpers;
+using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace _Scripts.UI
         {
             var resource = ResourcesRepository.Instance.GetResource(resourceSO);
 
-            countText.text = resource.Count.ToString();
+            countText.text = resource.Count.ToScientificNotationString();
         }
     }
 }
