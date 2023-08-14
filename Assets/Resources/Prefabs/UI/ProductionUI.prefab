@@ -376,14 +376,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4435904254832275681}
+  m_Father: {fileID: 4530754523674309796}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 419, y: 28}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -20, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &1547329498791272296
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -633,14 +633,14 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4435904254832275681}
+  m_Father: {fileID: 4530754523674309796}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -193, y: 28}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 20, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1656602274157429629
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -702,7 +702,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -768,8 +768,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2108993020258595695}
-  - {fileID: 7302348610604482028}
-  - {fileID: 5959213235925727874}
   - {fileID: 1828385016763325377}
   - {fileID: 4530754523674309796}
   - {fileID: 7720248533149478822}
@@ -793,7 +791,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 721626bffe674f24bf4381e893b8f456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceType: 1
+  productionSO: {fileID: 0}
   image: {fileID: 4204962876176706748}
   productionRate: {fileID: 1044904975482136889}
   productionCount: {fileID: 7295761677835349420}
@@ -899,7 +897,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5319542020477947429, guid: 981fa25f106877942be93a37edd10f29, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7302348610604482028}
+    - targetCorrespondingSourceObject: {fileID: 5319542020477947429, guid: 981fa25f106877942be93a37edd10f29, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5959213235925727874}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 981fa25f106877942be93a37edd10f29, type: 3}
 --- !u!114 &1434640135372801809 stripped

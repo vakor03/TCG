@@ -26,16 +26,33 @@ namespace _Scripts.UI
 
         private void Start()
         {
-            _production = ProductionsRepository.Instance.GetResourceProducer(productionSO);
+            _production = ProductionsRepository.Instance.GetProduction(productionSO);
             _connectedResource = ResourcesRepository.Instance.GetResource(productionSO.ConnectedResource);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
+            _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
+            _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
             _connectedResource.OnCountChanged += TargetResourceOnCountChanged;
 
             progressBarUI.Button.onClick.AddListener(StartProduction);
             buyButton.onClick.AddListener(BuyProducer);
 
             SetDefaultValues();
+        }
+
+        private void ProductionOnProductionCountChanged()
+        {
+            SetProductionCountText();
+        }
+
+        private void SetProductionCountText()
+        {
+            productionCount.text = _production.ProductionCount.ToScientificNotationString();
+        }
+
+        private void ProductionOnProductionRateChanged()
+        {
+            productionRate.text = _production.ProductionRate.ToString();
         }
 
         private void BuyProducer()
@@ -51,8 +68,8 @@ namespace _Scripts.UI
         private void SetDefaultValues()
         {
             image.sprite = productionSO.Sprite;
-            productionRate.text = productionSO.ProductionRate.ToString();
-            productionCount.text = productionSO.ProductionCount.ToString();
+            productionRate.text = _production.ProductionRate.ToString();
+            SetProductionCountText();
             buyButtonText.text = $"Buy x1 {_connectedResource.ResourceSO.Name}";
 
             countText.text = _connectedResource.Count.ToString();
