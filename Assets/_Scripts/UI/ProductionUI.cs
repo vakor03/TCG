@@ -57,7 +57,7 @@ namespace _Scripts.UI
 
         private void BuyProducer()
         {
-            _connectedResource.Count += 1;
+            Shop.Instance.TryBuyResource(_connectedResource.ResourceSO, 1);
         }
 
         private void TargetResourceOnCountChanged()
