@@ -36,4 +36,16 @@ namespace _Scripts.Repositories
             _marketItemsMap = _marketItemSOs.ToDictionary(so => so.OutputResource, so => so);
         }
     }
+
+    public class MarketItem
+    {
+        public MarketItemSO MarketItemSO { get; }
+        public ResourceSO OutputResource => MarketItemSO.OutputResource;
+        public Dictionary<ResourceSO, long> PricePerUnit => MarketItemSO.PricePerUnit;
+
+        public MarketItem(MarketItemSO marketItemSO)
+        {
+            MarketItemSO = marketItemSO;
+        }
+    }
 }

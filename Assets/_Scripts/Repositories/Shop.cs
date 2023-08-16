@@ -20,7 +20,7 @@ namespace _Scripts.Repositories
 
             _availableOptions = new[]
             {
-                new ShopOption("x1", ShopOptionType.Additive, 1),
+                new ShopOption("x1", ShopOptionType.DefinedNumber, 1),
                 new ShopOption("10%", ShopOptionType.Percent, 10),
                 new ShopOption("50%", ShopOptionType.Percent, 50),
                 new ShopOption("MAX", ShopOptionType.Percent, 100),
@@ -37,7 +37,68 @@ namespace _Scripts.Repositories
             OnShopOptionChanged?.Invoke();
         }
 
-        public bool TryBuyResource(ResourceSO resourceSO, int quantity)
+        public BigInteger CalculateCurrentBuyQuantity(ResourceSO resourceSO)
+        {
+            if (CurrentShopOption.Type == ShopOptionType.DefinedNumber)
+            {
+                if (FindMaxPossibleBuyCount(resourceSO) > CurrentShopOption.Value)
+                {
+                    return CurrentShopOption.Value;
+                }
+
+                return 0;
+            }
+
+            if (CurrentShopOption.Type == ShopOptionType.Percent)
+            {
+                var maxPossibleBuyCount = FindMaxPossibleBuyCount(resourceSO);
+                if (maxPossibleBuyCount == BigInteger.Zero)
+                {
+                    return BigInteger.Zero;
+                }
+                else
+                {
+                    return BigInteger.Max(BigInteger.One,
+                        maxPossibleBuyCount * CurrentShopOption.Value / 100);
+                }
+            }
+            
+            Debug.LogError($"{CurrentShopOption.Type} not supported!");
+            return BigInteger.Zero;
+        }
+
+        public BigInteger FindMaxPossibleBuyCount(ResourceSO resourceSO)
+        {
+            if (MarketRepository.Instance.TryGetMarketItem(resourceSO, out var marketItemSO))
+            {
+                BigInteger max;
+                bool firstValue = true;
+                foreach (var (reqResourceSO, reqCount) in marketItemSO.PricePerUnit)
+                {
+                    var currentMax = ResourcesRepository.Instance.GetResource(reqResourceSO).Count / reqCount;
+                    if (firstValue)
+                    {
+                        max = currentMax;
+                        firstValue = false;
+                    }
+                    else
+                    {
+                        if (currentMax < max)
+                        {
+                            max = currentMax;
+                        }
+                    }
+                }
+
+                return max;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public bool TryBuyResource(ResourceSO resourceSO, BigInteger quantity)
         {
             if (MarketRepository.Instance.TryGetMarketItem(resourceSO, out var marketItemSO))
             {
@@ -55,8 +116,10 @@ namespace _Scripts.Repositories
                 return false;
             }
         }
+        
+        
 
-        private void ExchangeResources(MarketItemSO marketItemSO, int quantity)
+        private void ExchangeResources(MarketItemSO marketItemSO, BigInteger quantity)
         {
             foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
             {
@@ -69,7 +132,7 @@ namespace _Scripts.Repositories
             ResourcesRepository.Instance.GetResource(marketItemSO.OutputResource).Count += quantity;
         }
 
-        public bool CheckEnoughResourcesToBuy(MarketItemSO marketItemSO, int quantity)
+        public bool CheckEnoughResourcesToBuy(MarketItemSO marketItemSO, BigInteger quantity)
         {
             foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
             {

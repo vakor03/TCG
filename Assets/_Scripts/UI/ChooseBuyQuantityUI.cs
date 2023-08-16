@@ -41,7 +41,7 @@ namespace _Scripts.UI
 
     public enum ShopOptionType
     {
-        Additive,
+        DefinedNumber,
         Percent
     }
 }

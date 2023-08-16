@@ -18,6 +18,8 @@ namespace _Scripts.Repositories
             base.Awake();
 
             AssembleResources();
+            
+            SetDefaultValuesToResources();
         }
 
         private void AssembleResources()
@@ -34,6 +36,14 @@ namespace _Scripts.Repositories
         public void IncreaseResourceCount(ResourceSO productionResource, BigInteger productionCount)
         {
             _resourcesMap[productionResource].Count += productionCount;
+        }
+
+        private void SetDefaultValuesToResources()
+        {
+            foreach (var (key, value) in _resourcesMap)
+            {
+                value.Count += 100;
+            }
         }
     }
 }

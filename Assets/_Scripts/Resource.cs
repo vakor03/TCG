@@ -10,6 +10,7 @@ namespace _Scripts
         private BigInteger _count;
 
         public event Action OnCountChanged;
+        public static event Action OnAnyResourceCountChanged;
 
         public ResourceSO ResourceSO
         {
@@ -23,6 +24,7 @@ namespace _Scripts
             {
                 _count = value;
                 OnCountChanged?.Invoke();
+                OnAnyResourceCountChanged?.Invoke();
             }
         }
 

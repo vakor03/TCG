@@ -1,4 +1,5 @@
-﻿using _Scripts.Helpers;
+﻿using System.Numerics;
+using _Scripts.Helpers;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
@@ -34,10 +35,26 @@ namespace _Scripts.UI
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
             _connectedResource.OnCountChanged += TargetResourceOnCountChanged;
 
+            Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
+            Resource.OnAnyResourceCountChanged += RecalculateCurrentBuyQuantity;
+
             progressBarUI.Button.onClick.AddListener(StartProduction);
             buyButton.onClick.AddListener(BuyProducer);
 
             SetDefaultValues();
+        }
+
+        private void OnDestroy()
+        {
+            Resource.OnAnyResourceCountChanged -= RecalculateCurrentBuyQuantity;
+        }
+
+        private BigInteger _currentBuyQuantity;
+        private void RecalculateCurrentBuyQuantity()
+        {
+            _currentBuyQuantity = Shop.Instance.CalculateCurrentBuyQuantity(_connectedResource.ResourceSO);
+            buyButtonText.text =
+                         $"Buy {_currentBuyQuantity.ToScientificNotationString()} {_connectedResource.ResourceSO.Name}";
         }
 
         private void ProductionOnProductionCountChanged()
@@ -57,7 +74,7 @@ namespace _Scripts.UI
 
         private void BuyProducer()
         {
-            Shop.Instance.TryBuyResource(_connectedResource.ResourceSO, 1);
+            Shop.Instance.TryBuyResource(_connectedResource.ResourceSO, _currentBuyQuantity);
         }
 
         private void TargetResourceOnCountChanged()
@@ -70,14 +87,14 @@ namespace _Scripts.UI
             image.sprite = productionSO.Sprite;
             productionRate.text = _production.ProductionRate.ToString();
             SetProductionCountText();
-            buyButtonText.text = $"Buy x1 {_connectedResource.ResourceSO.Name}";
+            RecalculateCurrentBuyQuantity();
 
             countText.text = _connectedResource.Count.ToString();
         }
 
         private void ProducerOnProductionStarted()
         {
-            progressBarUI.FillAndReset(productionSO.ProductionRate);
+            progressBarUI.FillAndReset(ProductionsRepository.Instance.GetProduction(productionSO).ProductionRate);
         }
 
         private void StartProduction()
