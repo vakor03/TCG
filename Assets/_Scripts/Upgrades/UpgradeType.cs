@@ -2,9 +2,10 @@
 {
     public enum UpgradeType
     {
-        Power,
-        Discount,
+        ProductionRate,
+        ProductionCount,
         Speed,
+        AutoProduction,
     }
 
     public interface IProductionUpgrade
