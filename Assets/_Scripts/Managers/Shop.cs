@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using _Scripts.Helpers;
+using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
@@ -70,13 +71,13 @@ namespace _Scripts.Managers
 
         public BigInteger FindMaxPossibleBuyCount(ResourceSO resourceSO)
         {
-            if (MarketRepository.Instance.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (RepositoriesHelper.GetRepository<MarketRepository>().TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 BigInteger max;
                 bool firstValue = true;
                 foreach (var (reqResourceSO, reqCount) in marketItemSO.PricePerUnit)
                 {
-                    var currentMax = ResourcesRepository.Instance.GetResourceQuantity(reqResourceSO) / reqCount;
+                    var currentMax = GameManager.Instance.InteractorsBase.GetInteractor<ResourcesInteractor>().GetResourceQuantity(reqResourceSO) / reqCount;
                     if (firstValue)
                     {
                         max = currentMax;
@@ -101,7 +102,7 @@ namespace _Scripts.Managers
 
         public bool TryBuyResource(ResourceSO resourceSO, BigInteger quantity)
         {
-            if (MarketRepository.Instance.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (RepositoriesHelper.GetRepository<MarketRepository>().TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 if (!CheckEnoughResourcesToBuy(marketItemSO, quantity))
                 {
@@ -125,17 +126,22 @@ namespace _Scripts.Managers
             {
                 BigInteger reqQuantityBigInteger = reqQuantityPerUnit * quantity;
 
-                ResourcesRepository.Instance.SpendResource(item, reqQuantityBigInteger);
+                GameManager.Instance.InteractorsBase
+                    .GetInteractor<ResourcesInteractor>()
+                    .SpendResource(item, reqQuantityBigInteger);
             }
 
-            ResourcesRepository.Instance.AddResource(marketItem.OutputResource, quantity);
+            GameManager.Instance.InteractorsBase
+                .GetInteractor<ResourcesInteractor>()
+                .AddResource(marketItem.OutputResource, quantity);
         }
 
         public bool CheckEnoughResourcesToBuy(MarketItem marketItemSO, BigInteger quantity)
         {
             foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
             {
-                if (!ResourcesRepository.Instance.IsEnoughResource(item, reqQuantity * quantity))
+                if (!GameManager.Instance.InteractorsBase
+                        .GetInteractor<ResourcesInteractor>().IsEnoughResource(item, reqQuantity * quantity))
                 {
                     return false;
                 }

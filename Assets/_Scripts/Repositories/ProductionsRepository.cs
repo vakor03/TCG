@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using _Scripts.Helpers;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
 
 namespace _Scripts.Repositories
 {
-    public class ProductionsRepository : StaticInstance<ProductionsRepository>
+    public class ProductionsRepository : IRepository
     {
         private const string PRODUCTIONS_PATH = "ScriptableObjects/Productions";
         private List<ProductionSO> _productionSOs;
@@ -14,14 +13,6 @@ namespace _Scripts.Repositories
         private Dictionary<ProductionSO, ProductionStats> _productionStatsMap;
 
         public List<ProductionSO> ProductionSOs => _productionSOs;
-
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            AssembleProductions();
-        }
 
         private void AssembleProductions()
         {
@@ -36,7 +27,7 @@ namespace _Scripts.Repositories
             });
         }
 
-        private void Start()
+        public void OnStart()
         {
             foreach (var production in _productionsMap.Values)
             {
@@ -47,6 +38,15 @@ namespace _Scripts.Repositories
         public Production GetProduction(ProductionSO productionsO)
         {
             return _productionsMap[productionsO];
+        }
+
+        public void Initialize()
+        {
+            AssembleProductions();
+        }
+
+        public void Save()
+        {
         }
     }
 }

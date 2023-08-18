@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using MEC;
@@ -69,7 +70,8 @@ namespace _Scripts
 
         public void OnStart()
         {
-            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            InteractorsHelper.GetInteractor<ResourcesInteractor>()
+                .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
 
             // ProductionRate = _productionSO.BaseProductionRate;
             UpdateProductionCount();
@@ -85,12 +87,12 @@ namespace _Scripts
 
         public void Dispose()
         {
-            ResourcesRepository.Instance.OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
+            InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
         }
 
         private void UpdateProductionCount()
         {
-            ProductionCount = ResourcesRepository.Instance.GetResourceQuantity(_connectedResource) *
+            ProductionCount = InteractorsHelper.GetInteractor<ResourcesInteractor>().GetResourceQuantity(_connectedResource) *
                               _productionStats.ProductionCount;
         }
 
@@ -116,7 +118,7 @@ namespace _Scripts
 
             yield return Timing.WaitForSeconds(_productionStats.ProductionRate);
 
-            ResourcesRepository.Instance.AddResource(_productedResource, ProductionCount);
+            InteractorsHelper.GetInteractor<ResourcesInteractor>().AddResource(_productedResource, ProductionCount);
 
             OnProductionFinished?.Invoke();
             _currentState = State.Stopped;

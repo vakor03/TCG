@@ -1,4 +1,5 @@
 ﻿using _Scripts.Helpers;
+using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
@@ -22,12 +23,12 @@ namespace _Scripts.UI
 
         private void Start()
         {
-            _production = ProductionsRepository.Instance.GetProduction(productionSO);
+            _production = RepositoriesHelper.GetRepository<ProductionsRepository>().GetProduction(productionSO);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
-            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
             
             progressBarUI.Button.onClick.AddListener(StartProduction);
 
@@ -60,7 +61,8 @@ namespace _Scripts.UI
         
         private void SetResourceCountText()
         {
-            countText.text = ResourcesRepository.Instance.GetResourceQuantity(productionSO.ConnectedResource).ToScientificNotationString();
+            countText.text = GameManager.Instance.InteractorsBase.GetInteractor<ResourcesInteractor>()
+                .GetResourceQuantity(productionSO.ConnectedResource).ToScientificNotationString();
         }
 
         private void SetDefaultValues()
@@ -74,7 +76,7 @@ namespace _Scripts.UI
 
         private void ProducerOnProductionStarted()
         {
-            progressBarUI.FillAndReset(ProductionsRepository.Instance.GetProduction(productionSO).ProductionRate);
+            progressBarUI.FillAndReset(RepositoriesHelper.GetRepository<ProductionsRepository>().GetProduction(productionSO).ProductionRate);
         }
 
         private void StartProduction()

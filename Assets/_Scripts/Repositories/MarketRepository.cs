@@ -6,20 +6,13 @@ using UnityEngine;
 
 namespace _Scripts.Repositories
 {
-    public class MarketRepository : StaticInstance<MarketRepository>
+    public class MarketRepository : IRepository
     {
         private const string MARKET_ITEM_PATH = "ScriptableObjects/MarketItems";
 
         private List<MarketItemSO> _marketItemSOs;
         private Dictionary<ResourceSO, MarketItemSO> _marketItemSOsMap;
         private Dictionary<ResourceSO, MarketItem> _marketItemsMap;
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            AssembleResources();
-        }
 
         public MarketItem GetMarketItem(ResourceSO resourceSO)
         {
@@ -36,6 +29,15 @@ namespace _Scripts.Repositories
             _marketItemSOs = Resources.LoadAll<MarketItemSO>(MARKET_ITEM_PATH).ToList();
             _marketItemSOsMap = _marketItemSOs.ToDictionary(so => so.OutputResource, so => so);
             _marketItemsMap = _marketItemSOs.ToDictionary(so => so.OutputResource, so => new MarketItem(so));
+        }
+
+        public void Initialize()
+        {
+            AssembleResources();
+        }
+
+        public void Save()
+        {
         }
     }
 }

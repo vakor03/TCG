@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using _Scripts.Helpers;
+using _Scripts.Interactors;
 using _Scripts.Managers;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
@@ -22,7 +23,8 @@ namespace _Scripts.UI
             buyButton.onClick.AddListener(BuyProducer);
 
             Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
-            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            InteractorsHelper.GetInteractor<ResourcesInteractor>()
+                .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
             
             RecalculateCurrentBuyQuantity();
         }
