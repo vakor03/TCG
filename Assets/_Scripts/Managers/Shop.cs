@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Numerics;
 using _Scripts.Helpers;
+using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
 using UnityEngine;
 
-namespace _Scripts.Repositories
+namespace _Scripts.Managers
 {
     public class Shop : StaticInstance<Shop>
     {
@@ -62,7 +63,7 @@ namespace _Scripts.Repositories
                         maxPossibleBuyCount * CurrentShopOption.Value / 100);
                 }
             }
-            
+
             Debug.LogError($"{CurrentShopOption.Type} not supported!");
             return BigInteger.Zero;
         }
@@ -75,7 +76,7 @@ namespace _Scripts.Repositories
                 bool firstValue = true;
                 foreach (var (reqResourceSO, reqCount) in marketItemSO.PricePerUnit)
                 {
-                    var currentMax = ResourcesRepository.Instance.GetResource(reqResourceSO).Count / reqCount;
+                    var currentMax = ResourcesRepository.Instance.GetResourceQuantity(reqResourceSO) / reqCount;
                     if (firstValue)
                     {
                         max = currentMax;
@@ -116,28 +117,25 @@ namespace _Scripts.Repositories
                 return false;
             }
         }
-        
-        
 
-        private void ExchangeResources(MarketItemSO marketItemSO, BigInteger quantity)
+
+        private void ExchangeResources(MarketItem marketItem, BigInteger quantity)
         {
-            foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
+            foreach (var (item, reqQuantityPerUnit) in marketItem.PricePerUnit)
             {
-                BigInteger reqQuantityBigInteger = reqQuantity * quantity;
-                
-                ResourcesRepository.Instance.GetResource(item).Count -=
-                    reqQuantityBigInteger;
+                BigInteger reqQuantityBigInteger = reqQuantityPerUnit * quantity;
+
+                ResourcesRepository.Instance.SpendResource(item, reqQuantityBigInteger);
             }
 
-            ResourcesRepository.Instance.GetResource(marketItemSO.OutputResource).Count += quantity;
+            ResourcesRepository.Instance.AddResource(marketItem.OutputResource, quantity);
         }
 
-        public bool CheckEnoughResourcesToBuy(MarketItemSO marketItemSO, BigInteger quantity)
+        public bool CheckEnoughResourcesToBuy(MarketItem marketItemSO, BigInteger quantity)
         {
             foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
             {
-                if (ResourcesRepository.Instance.GetResource(item).Count <
-                    reqQuantity * quantity)
+                if (!ResourcesRepository.Instance.IsEnoughResource(item, reqQuantity * quantity))
                 {
                     return false;
                 }

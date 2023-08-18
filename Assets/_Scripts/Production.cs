@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
-using _Scripts.Upgrades;
 using MEC;
 
 #endregion
@@ -19,7 +18,6 @@ namespace _Scripts
 
         private BigInteger _productionCount;
 
-        // private ProductionSO _productionSO;
         private ProductionStats _productionStats;
         private ResourceSO _productedResource;
         private ResourceSO _connectedResource;
@@ -33,6 +31,7 @@ namespace _Scripts
 
             _productionStats.OnAutoProductionChanged += ProductionStatsOnAutoProductionChanged;
             _productionStats.OnProductionRateChanged += () => OnProductionRateChanged?.Invoke();
+            _productionStats.OnProductionCountChanged += UpdateProductionCount;
         }
 
         private void ProductionStatsOnAutoProductionChanged(bool value)
@@ -70,22 +69,28 @@ namespace _Scripts
 
         public void OnStart()
         {
-            ResourcesRepository.Instance.GetResource(_connectedResource).OnCountChanged +=
-                UpdateProductionCount;
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
 
             // ProductionRate = _productionSO.BaseProductionRate;
             UpdateProductionCount();
         }
 
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
+        {
+            if (changedResource == _connectedResource)
+            {
+                UpdateProductionCount();
+            }
+        }
+
         public void Dispose()
         {
-            ResourcesRepository.Instance.GetResource(_connectedResource).OnCountChanged -=
-                UpdateProductionCount;
+            ResourcesRepository.Instance.OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
         }
 
         private void UpdateProductionCount()
         {
-            ProductionCount = ResourcesRepository.Instance.GetResource(_connectedResource).Count *
+            ProductionCount = ResourcesRepository.Instance.GetResourceQuantity(_connectedResource) *
                               _productionStats.ProductionCount;
         }
 
@@ -111,7 +116,7 @@ namespace _Scripts
 
             yield return Timing.WaitForSeconds(_productionStats.ProductionRate);
 
-            ResourcesRepository.Instance.IncreaseResourceCount(_productedResource, ProductionCount);
+            ResourcesRepository.Instance.AddResource(_productedResource, ProductionCount);
 
             OnProductionFinished?.Invoke();
             _currentState = State.Stopped;
@@ -131,40 +136,6 @@ namespace _Scripts
             Stopped,
             Production,
             AutoProduction
-        }
-    }
-
-    public class ProductionStats
-    {
-        public bool AutoProduction { get; private set; }
-        public BigInteger ProductionCount { get; private set; }
-        public float ProductionRate { get; private set; }
-        private List<ProductionUpgrade> _productionUpgrades;
-
-        public event Action<bool> OnAutoProductionChanged;
-        public event Action OnProductionCountChanged;
-        public event Action OnProductionRateChanged;
-
-        public ProductionStats(ProductionSO productionSO)
-        {
-            AutoProduction = false;
-            ProductionCount = productionSO.ProductionCount;
-            ProductionRate = productionSO.BaseProductionRate;
-        }
-
-        public void UnlockUpgrade(ProductionUpgrade productionUpgrade)
-        {
-            if (productionUpgrade.UpgradeType == UpgradeType.AutoProduction)
-            {
-                AutoProduction = true;
-                OnAutoProductionChanged?.Invoke(true);
-            }
-            else if (productionUpgrade.UpgradeType == UpgradeType.ProductionRate)
-            {
-                var productionRateUpgrade = (ProductionRateUpgrade) productionUpgrade;
-                ProductionRate /= productionRateUpgrade.Value;
-                OnProductionRateChanged?.Invoke();
-            }
         }
     }
 }

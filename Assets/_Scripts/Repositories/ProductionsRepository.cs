@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using _Scripts.Helpers;
 using _Scripts.ScriptableObjects;
-using _Scripts.Upgrades;
 using UnityEngine;
 
 namespace _Scripts.Repositories
@@ -43,23 +41,6 @@ namespace _Scripts.Repositories
             foreach (var production in _productionsMap.Values)
             {
                 production.OnStart();
-            }
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                var testUpgrade = new AutoProductionUpgrade(new List<ProductionStats>
-                    { _productionStatsMap[_productionSOs[0]] });
-                testUpgrade.DoUpgrade();
-            }
-
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                var testUpgrade = new ProductionRateUpgrade(new List<ProductionStats>
-                    { _productionStatsMap[_productionSOs[0]] }, 2);
-                testUpgrade.DoUpgrade();
             }
         }
 

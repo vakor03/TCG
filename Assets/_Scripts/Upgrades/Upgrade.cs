@@ -46,4 +46,15 @@ namespace _Scripts.Upgrades
             Value = value;
         }
     }
+    
+    public class ProductionCountUpgrade : ProductionUpgrade
+    {
+        public long Value { get; set; }
+        
+        public ProductionCountUpgrade(List<ProductionStats> productionsToUpgrade, long value) : base(productionsToUpgrade,
+            UpgradeType.ProductionCount)
+        {
+            Value = value;
+        }
+    }
 }

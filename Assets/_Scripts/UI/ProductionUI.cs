@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using _Scripts.Helpers;
+﻿using _Scripts.Helpers;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
@@ -17,45 +16,32 @@ namespace _Scripts.UI
         [SerializeField] private TextMeshProUGUI productionCount;
         [SerializeField] private TextMeshProUGUI countText;
 
-        [SerializeField] private Button buyButton;
-        [SerializeField] private TextMeshProUGUI buyButtonText;
-
         [SerializeField] private ProgressBarUI progressBarUI;
 
         private Production _production;
-        private Resource _connectedResource;
 
         private void Start()
         {
             _production = ProductionsRepository.Instance.GetProduction(productionSO);
-            _connectedResource = ResourcesRepository.Instance.GetResource(productionSO.ConnectedResource);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
-            _connectedResource.OnCountChanged += TargetResourceOnCountChanged;
-
-            Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
-            Resource.OnAnyResourceCountChanged += RecalculateCurrentBuyQuantity;
-
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            
             progressBarUI.Button.onClick.AddListener(StartProduction);
-            buyButton.onClick.AddListener(BuyProducer);
 
             SetDefaultValues();
         }
 
-        private void OnDestroy()
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
         {
-            Resource.OnAnyResourceCountChanged -= RecalculateCurrentBuyQuantity;
+            if (changedResource == productionSO.ConnectedResource)
+            {
+                SetResourceCountText();
+            }
         }
 
-        private BigInteger _currentBuyQuantity;
-        private void RecalculateCurrentBuyQuantity()
-        {
-            _currentBuyQuantity = Shop.Instance.CalculateCurrentBuyQuantity(_connectedResource.ResourceSO);
-            buyButtonText.text =
-                         $"Buy {_currentBuyQuantity.ToScientificNotationString()} {_connectedResource.ResourceSO.Name}";
-        }
 
         private void ProductionOnProductionCountChanged()
         {
@@ -71,15 +57,10 @@ namespace _Scripts.UI
         {
             productionRate.text = _production.ProductionRate.ToString();
         }
-
-        private void BuyProducer()
+        
+        private void SetResourceCountText()
         {
-            Shop.Instance.TryBuyResource(_connectedResource.ResourceSO, _currentBuyQuantity);
-        }
-
-        private void TargetResourceOnCountChanged()
-        {
-            countText.text = _connectedResource.Count.ToScientificNotationString();
+            countText.text = ResourcesRepository.Instance.GetResourceQuantity(productionSO.ConnectedResource).ToScientificNotationString();
         }
 
         private void SetDefaultValues()
@@ -87,9 +68,8 @@ namespace _Scripts.UI
             image.sprite = productionSO.Sprite;
             productionRate.text = _production.ProductionRate.ToString();
             SetProductionCountText();
-            RecalculateCurrentBuyQuantity();
 
-            countText.text = _connectedResource.Count.ToString();
+           SetResourceCountText();
         }
 
         private void ProducerOnProductionStarted()
