@@ -22,8 +22,13 @@ namespace _Scripts.UI
             buyButton.onClick.AddListener(BuyProducer);
 
             Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
-            ResourcesRepository.Instance.OnAnyResourceQuantityChanged += RecalculateCurrentBuyQuantity;
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
             
+            RecalculateCurrentBuyQuantity();
+        }
+
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO ignored)
+        {
             RecalculateCurrentBuyQuantity();
         }
 

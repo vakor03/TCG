@@ -16,17 +16,14 @@ namespace _Scripts.Repositories
     {
         private const string PLAYER_PREFS_RESOURCES_PREFIX = "RES_KEY_";
         private const string RESOURCES_PATH = "ScriptableObjects/Resources";
+        
         private List<ResourceSO> _resourceSOs;
-
-
         private Dictionary<ResourceSO, BigInteger> _resourcesQuantityMap;
-        // private Dictionary<ResourceSO, Resource> _resourcesMap;
 
         protected override void Awake()
         {
             base.Awake();
 
-            // AssembleResources();
             Initialize();
         }
 
@@ -38,22 +35,6 @@ namespace _Scripts.Repositories
             }
         }
 
-        private void AssembleResources()
-        {
-            _resourceSOs = Resources.LoadAll<ResourceSO>(RESOURCES_PATH).ToList();
-            // _resourcesMap = _resourceSOs.ToDictionary(so => so, so => new Resource(so));
-        }
-
-        // public Resource GetResource(ResourceSO resourceSO)
-        // {
-        //     return _resourcesMap[resourceSO];
-        // }
-
-        // public void IncreaseResourceCount(ResourceSO productionResource, BigInteger productionCount)
-        // {
-        //     _resourcesMap[productionResource].Count += productionCount;
-        // }
-
         public void Initialize()
         {
             _resourceSOs = Resources.LoadAll<ResourceSO>(RESOURCES_PATH).ToList();
@@ -62,7 +43,7 @@ namespace _Scripts.Repositories
             foreach (var resourceSO in _resourceSOs)
             {
                 var resourceCount =
-                    PlayerPrefs.GetString(PLAYER_PREFS_RESOURCES_PREFIX + resourceSO.Name, "100");
+                    PlayerPrefs.GetString(GetPlayerPrefsKey(resourceSO), "100");
                 
                SetResourceQuantity(resourceSO, BigInteger.Parse(resourceCount));
             }
@@ -72,13 +53,17 @@ namespace _Scripts.Repositories
         {
             foreach (var (resourceSO, quantity) in _resourcesQuantityMap)
             {
-                PlayerPrefs.SetString(PLAYER_PREFS_RESOURCES_PREFIX + resourceSO.Name, quantity.ToString());
+                PlayerPrefs.SetString(GetPlayerPrefsKey(resourceSO), quantity.ToString());
             }
 
             PlayerPrefs.Save();
         }
+        
+        private string GetPlayerPrefsKey(ResourceSO resourceSO)
+        {
+            return PLAYER_PREFS_RESOURCES_PREFIX + resourceSO.Name;
+        }
 
-        public event Action OnAnyResourceQuantityChanged;
         public event Action<ResourceSO> OnResourceQuantityChanged;
 
         public BigInteger GetResourceQuantity(ResourceSO resource)
@@ -96,7 +81,6 @@ namespace _Scripts.Repositories
 
             _resourcesQuantityMap[resource] = newValue;
 
-            OnAnyResourceQuantityChanged?.Invoke();
             OnResourceQuantityChanged?.Invoke(resource);
         }
 
