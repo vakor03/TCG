@@ -494,6 +494,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1654724461}
     m_Modifications:
+    - target: {fileID: 1976245177095412976, guid: db6f8733a473dfd46bbcfe3b6e5e52c1, type: 3}
+      propertyPath: resourceSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 110760046fd5a484c934863301b00518, type: 2}
     - target: {fileID: 4204962876176706748, guid: db6f8733a473dfd46bbcfe3b6e5e52c1, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1115,7 +1119,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5110573458000112766, guid: 1fdbcd31d4cdc61489452fd96a9e88f9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -45
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5110573458000112766, guid: 1fdbcd31d4cdc61489452fd96a9e88f9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1234,6 +1238,22 @@ PrefabInstance:
     - target: {fileID: 4548893881227060963, guid: 157bc3dd96095a641a961b7e58705f16, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7814278190388273368, guid: 157bc3dd96095a641a961b7e58705f16, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7814278190388273368, guid: 157bc3dd96095a641a961b7e58705f16, type: 3}
+      propertyPath: m_UseGraphicAlpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7814278190388273368, guid: 157bc3dd96095a641a961b7e58705f16, type: 3}
+      propertyPath: m_EffectDistance.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7814278190388273368, guid: 157bc3dd96095a641a961b7e58705f16, type: 3}
+      propertyPath: m_EffectDistance.y
+      value: -5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

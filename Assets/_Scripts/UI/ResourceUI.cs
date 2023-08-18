@@ -13,23 +13,23 @@ namespace _Scripts.UI
 
         private void Start()
         {
-            var resource = ResourcesRepository.Instance.GetResource(resourceSO);
-            
-            resource.OnCountChanged += ResourceOnCountChanged;
-            
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+
             UpdateCountText();
         }
 
-        private void ResourceOnCountChanged()
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
         {
-            UpdateCountText();
+            if (changedResource == resourceSO)
+            {
+                UpdateCountText();
+            }
         }
 
         private void UpdateCountText()
         {
-            var resource = ResourcesRepository.Instance.GetResource(resourceSO);
-
-            countText.text = resource.Count.ToScientificNotationString();
+            countText.text = ResourcesRepository.Instance.GetResourceQuantity(resourceSO)
+                .ToScientificNotationString();
         }
     }
 }

@@ -1,74 +1,42 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using MEC;
 
+#endregion
+
 namespace _Scripts
 {
     public class Production : IDisposable
     {
-        public event Action OnProductionFinished;
-        public event Action OnProductionStarted;
-        public event Action OnProductionCountChanged;
-        public event Action OnProductionRateChanged;
-
-        public bool AutoProduction { get; private set; }
-
+        private CoroutineHandle _currentProductionCoroutine;
         private State _currentState;
-        private ProductionSO _productionSO;
-
-        public BigInteger ProductionCount
-        {
-            get => _productionCount;
-            set
-            {
-                _productionCount = value;
-                OnProductionCountChanged?.Invoke();
-            }
-        }
 
         private BigInteger _productionCount;
 
-        private float _productionRate;
+        private ProductionStats _productionStats;
+        private ResourceSO _productedResource;
+        private ResourceSO _connectedResource;
 
-        public float ProductionRate
-        {
-            get => _productionRate;
-            set
-            {
-                _productionRate = value;
-                OnProductionRateChanged?.Invoke();
-            }
-        }
-
-        public Production(ProductionSO productionSO)
+        public Production(ProductionStats productionStats, ResourceSO productedResource, ResourceSO connectedResource)
         {
             _currentState = State.Stopped;
-            _productionSO = productionSO;
+            _productionStats = productionStats;
+            _productedResource = productedResource;
+            _connectedResource = connectedResource;
+
+            _productionStats.OnAutoProductionChanged += ProductionStatsOnAutoProductionChanged;
+            _productionStats.OnProductionRateChanged += () => OnProductionRateChanged?.Invoke();
+            _productionStats.OnProductionCountChanged += UpdateProductionCount;
         }
 
-        public void OnStart()
+        private void ProductionStatsOnAutoProductionChanged(bool value)
         {
-            ResourcesRepository.Instance.GetResource(_productionSO.ConnectedResource).OnCountChanged +=
-                CalculateNewProductionCount;
-
-            ProductionRate = _productionSO.ProductionRate;
-            CalculateNewProductionCount();
-        }
-
-        private void CalculateNewProductionCount()
-        {
-            ProductionCount = ResourcesRepository.Instance.GetResource(_productionSO.ConnectedResource).Count *
-                              _productionSO.ProductionCount;
-        }
-
-        public void ToggleAutoProduction()
-        {
-            AutoProduction = !AutoProduction;
-
-            if (AutoProduction)
+            if (value)
             {
                 if (_currentState == State.Stopped)
                 {
@@ -77,6 +45,53 @@ namespace _Scripts
 
                 Timing.RunCoroutine(AutoProductionCoroutine());
             }
+        }
+
+        public BigInteger ProductionCount
+        {
+            get => _productionCount;
+            private set
+            {
+                _productionCount = value;
+                OnProductionCountChanged?.Invoke();
+            }
+        }
+
+        public float ProductionRate => _productionStats.ProductionRate;
+
+        public event Action OnProductionFinished;
+
+        public event Action OnProductionStarted;
+
+        public event Action OnProductionCountChanged;
+
+        public event Action OnProductionRateChanged;
+
+        public void OnStart()
+        {
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+
+            // ProductionRate = _productionSO.BaseProductionRate;
+            UpdateProductionCount();
+        }
+
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
+        {
+            if (changedResource == _connectedResource)
+            {
+                UpdateProductionCount();
+            }
+        }
+
+        public void Dispose()
+        {
+            ResourcesRepository.Instance.OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
+        }
+
+        private void UpdateProductionCount()
+        {
+            ProductionCount = ResourcesRepository.Instance.GetResourceQuantity(_connectedResource) *
+                              _productionStats.ProductionCount;
         }
 
         public void StartProduction()
@@ -89,8 +104,6 @@ namespace _Scripts
             StartOneTimeProductionCoroutine();
         }
 
-        private CoroutineHandle _currentProductionCoroutine;
-
         private void StartOneTimeProductionCoroutine()
         {
             _currentProductionCoroutine = Timing.RunCoroutine(OneTimeProductionCoroutine());
@@ -101,9 +114,9 @@ namespace _Scripts
             _currentState = State.Production;
             OnProductionStarted?.Invoke();
 
-            yield return Timing.WaitForSeconds(_productionSO.ProductionRate);
+            yield return Timing.WaitForSeconds(_productionStats.ProductionRate);
 
-            AddResourceToRepository();
+            ResourcesRepository.Instance.AddResource(_productedResource, ProductionCount);
 
             OnProductionFinished?.Invoke();
             _currentState = State.Stopped;
@@ -111,18 +124,11 @@ namespace _Scripts
 
         private IEnumerator<float> AutoProductionCoroutine()
         {
-            while (AutoProduction)
+            while (_productionStats.AutoProduction)
             {
                 yield return Timing.WaitUntilDone(_currentProductionCoroutine);
                 StartOneTimeProductionCoroutine();
             }
-        }
-
-        private void AddResourceToRepository()
-        {
-            var productionResource = _productionSO.ProductionResource;
-
-            ResourcesRepository.Instance.IncreaseResourceCount(productionResource, ProductionCount);
         }
 
         private enum State
@@ -130,12 +136,6 @@ namespace _Scripts
             Stopped,
             Production,
             AutoProduction
-        }
-
-        public void Dispose()
-        {
-            ResourcesRepository.Instance.GetResource(_productionSO.ConnectedResource).OnCountChanged -=
-                CalculateNewProductionCount;
         }
     }
 }

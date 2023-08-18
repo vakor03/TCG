@@ -16,29 +16,32 @@ namespace _Scripts.UI
         [SerializeField] private TextMeshProUGUI productionCount;
         [SerializeField] private TextMeshProUGUI countText;
 
-        [SerializeField] private Button buyButton;
-        [SerializeField] private TextMeshProUGUI buyButtonText;
-
         [SerializeField] private ProgressBarUI progressBarUI;
 
         private Production _production;
-        private Resource _connectedResource;
 
         private void Start()
         {
             _production = ProductionsRepository.Instance.GetProduction(productionSO);
-            _connectedResource = ResourcesRepository.Instance.GetResource(productionSO.ConnectedResource);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
-            _connectedResource.OnCountChanged += TargetResourceOnCountChanged;
-
+            ResourcesRepository.Instance.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            
             progressBarUI.Button.onClick.AddListener(StartProduction);
-            buyButton.onClick.AddListener(BuyProducer);
 
             SetDefaultValues();
         }
+
+        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
+        {
+            if (changedResource == productionSO.ConnectedResource)
+            {
+                SetResourceCountText();
+            }
+        }
+
 
         private void ProductionOnProductionCountChanged()
         {
@@ -54,15 +57,10 @@ namespace _Scripts.UI
         {
             productionRate.text = _production.ProductionRate.ToString();
         }
-
-        private void BuyProducer()
+        
+        private void SetResourceCountText()
         {
-            Shop.Instance.TryBuyResource(_connectedResource.ResourceSO, 1);
-        }
-
-        private void TargetResourceOnCountChanged()
-        {
-            countText.text = _connectedResource.Count.ToScientificNotationString();
+            countText.text = ResourcesRepository.Instance.GetResourceQuantity(productionSO.ConnectedResource).ToScientificNotationString();
         }
 
         private void SetDefaultValues()
@@ -70,14 +68,13 @@ namespace _Scripts.UI
             image.sprite = productionSO.Sprite;
             productionRate.text = _production.ProductionRate.ToString();
             SetProductionCountText();
-            buyButtonText.text = $"Buy x1 {_connectedResource.ResourceSO.Name}";
 
-            countText.text = _connectedResource.Count.ToString();
+           SetResourceCountText();
         }
 
         private void ProducerOnProductionStarted()
         {
-            progressBarUI.FillAndReset(productionSO.ProductionRate);
+            progressBarUI.FillAndReset(ProductionsRepository.Instance.GetProduction(productionSO).ProductionRate);
         }
 
         private void StartProduction()

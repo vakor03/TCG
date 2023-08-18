@@ -6,7 +6,7 @@ namespace _Scripts.ScriptableObjects
     public class ProductionSO : ScriptableObject
     {
         [field: SerializeField] public ResourceSO ConnectedResource { get; private set; }
-        [field: SerializeField] public float ProductionRate { get; private set; }
+        [field: SerializeField] public float BaseProductionRate { get; private set; }
         [field: SerializeField] public long ProductionCount { get; private set; }
         [field: SerializeField] public Sprite Sprite { get; private set; }
         [field: SerializeField] public ResourceSO ProductionResource { get; private set; }

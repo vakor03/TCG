@@ -493,6 +493,7 @@ GameObject:
   - component: {fileID: 2962525040085597443}
   - component: {fileID: 7503218791581371429}
   - component: {fileID: 4018172066721841275}
+  - component: {fileID: 1976245177095412976}
   m_Layer: 0
   m_Name: BuyButton
   m_TagString: Untagged
@@ -603,6 +604,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1976245177095412976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5677368874151364749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff036f35122e4ffdb83880649e556365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceSO: {fileID: 11400000, guid: 03eb5822f4bb1c841896df9215c71fb4, type: 2}
+  buyButton: {fileID: 4018172066721841275}
+  buyButtonText: {fileID: 3052832966585981501}
 --- !u!1 &6370799511629617016
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,8 +812,6 @@ MonoBehaviour:
   productionRate: {fileID: 1044904975482136889}
   productionCount: {fileID: 7295761677835349420}
   countText: {fileID: 7384536260363128876}
-  buyButton: {fileID: 4018172066721841275}
-  buyButtonText: {fileID: 3052832966585981501}
   progressBarUI: {fileID: 1434640135372801809}
 --- !u!1001 &8589128046236400257
 PrefabInstance:
