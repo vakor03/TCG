@@ -2,7 +2,9 @@
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
+using _Scripts.ScriptableObjects;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts
 {
@@ -10,6 +12,8 @@ namespace _Scripts
     {
         public InteractorsBase InteractorsBase { get; private set; }
         public RepositoriesBase RepositoriesBase { get; private set; }
+        [FormerlySerializedAs("firstLevelConfig")] [SerializeField] private LevelConfigSO firstLevelConfigSO;
+        
         
         protected override void Awake()
         {
@@ -25,6 +29,14 @@ namespace _Scripts
             InteractorsBase.InitializeAllInteractors();
             
             RepositoriesBase.SendOnStartToAllRepositories();
+        }
+
+        private void Start()
+        {
+            foreach (var production in firstLevelConfigSO.ProductionsAvailable)
+            {
+                ProductionsGroup.Instance.AddProduction(production);
+            }
         }
 
         private void Update()

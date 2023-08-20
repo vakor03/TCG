@@ -12,7 +12,7 @@ namespace _Scripts.UI
 {
     public class BuyResourceButtonUI : MonoBehaviour
     {
-        [SerializeField] private ResourceSO resourceSO;
+        private ResourceSO _resourceSO;
         [SerializeField] private Button buyButton;
         [SerializeField] private TextMeshProUGUI buyButtonText;
 
@@ -20,12 +20,17 @@ namespace _Scripts.UI
 
         private void Start()
         {
+        }
+
+        public void Init(ResourceSO resourceSO)
+        {
+            _resourceSO = resourceSO;
             buyButton.onClick.AddListener(BuyProducer);
 
             Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
             InteractorsHelper.GetInteractor<ResourcesInteractor>()
                 .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
-            
+
             RecalculateCurrentBuyQuantity();
         }
 
@@ -36,14 +41,14 @@ namespace _Scripts.UI
 
         private void RecalculateCurrentBuyQuantity()
         {
-            _currentBuyQuantity = Shop.Instance.CalculateCurrentBuyQuantity(resourceSO);
+            _currentBuyQuantity = Shop.Instance.CalculateCurrentBuyQuantity(_resourceSO);
             buyButtonText.text =
-                $"Buy {_currentBuyQuantity.ToScientificNotationString()} {resourceSO.Name}";
+                $"Buy {_currentBuyQuantity.ToScientificNotationString()} {_resourceSO.Name}";
         }
 
         private void BuyProducer()
         {
-            Shop.Instance.TryBuyResource(resourceSO, _currentBuyQuantity);
+            Shop.Instance.TryBuyResource(_resourceSO, _currentBuyQuantity);
         }
     }
 }

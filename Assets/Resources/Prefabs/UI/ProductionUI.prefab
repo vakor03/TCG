@@ -201,8 +201,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: f61e9ce8e84fef143a3c0bc152d65669, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: eab1c583939a7724992be1eefe58109e, type: 3}
+  m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -616,7 +616,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff036f35122e4ffdb83880649e556365, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resourceSO: {fileID: 11400000, guid: 03eb5822f4bb1c841896df9215c71fb4, type: 2}
   buyButton: {fileID: 4018172066721841275}
   buyButtonText: {fileID: 3052832966585981501}
 --- !u!1 &6370799511629617016
@@ -807,12 +806,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 721626bffe674f24bf4381e893b8f456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  productionSO: {fileID: 0}
   image: {fileID: 4204962876176706748}
   productionRate: {fileID: 1044904975482136889}
   productionCount: {fileID: 7295761677835349420}
   countText: {fileID: 7384536260363128876}
   progressBarUI: {fileID: 1434640135372801809}
+  buyResourceButtonUI: {fileID: 1976245177095412976}
 --- !u!1001 &8589128046236400257
 PrefabInstance:
   m_ObjectHideFlags: 0
