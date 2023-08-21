@@ -3,8 +3,8 @@ using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
+using _Scripts.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts
 {
@@ -12,8 +12,8 @@ namespace _Scripts
     {
         public InteractorsBase InteractorsBase { get; private set; }
         public RepositoriesBase RepositoriesBase { get; private set; }
-        [FormerlySerializedAs("firstLevelConfig")] [SerializeField] private LevelConfigSO firstLevelConfigSO;
-        
+        [SerializeField] private LevelConfigSO firstLevelConfigSO;
+        private OfflineIncomeManager _offlineIncomeManager;
         
         protected override void Awake()
         {
@@ -29,10 +29,24 @@ namespace _Scripts
             InteractorsBase.InitializeAllInteractors();
             
             RepositoriesBase.SendOnStartToAllRepositories();
+
+            _offlineIncomeManager = new OfflineIncomeManager();
         }
 
         private void Start()
         {
+            if (_offlineIncomeManager.TryGetTimeFromLastTimeOnline(out var seconds, out var time))
+            {
+                LastTimeOnlineUI.Instance.Show();
+                LastTimeOnlineUI.Instance.Setup(time);
+                Debug.Log("Hello again my friend!");
+                Debug.Log($"You were left for {seconds} seconds");
+            }
+            else
+            {
+                LastTimeOnlineUI.Instance.Hide();
+                Debug.Log("First time playing?");
+            }
             foreach (var production in firstLevelConfigSO.ProductionsAvailable)
             {
                 ProductionsGroup.Instance.AddProduction(production);
@@ -43,6 +57,7 @@ namespace _Scripts
         {
             if (Input.GetKeyDown(KeyCode.S))
             {
+                _offlineIncomeManager.Save();
                 RepositoriesBase.SaveAllRepositories();
             }
         }

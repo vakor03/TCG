@@ -36,7 +36,7 @@ namespace _Scripts.UI
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
             InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged +=
                 ResourcesRepositoryOnResourceQuantityChanged;
-
+  
             progressBarUI.Button.onClick.AddListener(StartProduction);
 
             SetDefaultValues();
