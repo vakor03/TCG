@@ -5,32 +5,40 @@ using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
 using UnityEngine;
+using Zenject;
 
 namespace _Scripts
 {
     public class GameManager : StaticInstance<GameManager>
     {
-        public InteractorsBase InteractorsBase { get; private set; }
-        public RepositoriesBase RepositoriesBase { get; private set; }
+        [Inject] public InteractorsBase InteractorsBase { get; private set; }
+        [Inject] public RepositoriesBase RepositoriesBase { get; private set; }
+        [Inject] private OfflineIncomeManager _offlineIncomeManager;
+
         [SerializeField] private LevelConfigSO firstLevelConfigSO;
-        private OfflineIncomeManager _offlineIncomeManager;
 
         protected override void Awake()
         {
             base.Awake();
 
-            RepositoriesBase = new RepositoriesBase();
-            InteractorsBase = new InteractorsBase();
+            // RepositoriesBase = new RepositoriesBase();
+            // InteractorsBase = new InteractorsBase();
+            //
+            // RepositoriesBase.CreateAllRepositories();
+            // InteractorsBase.CreateAllInteractors();
+            //
+            // RepositoriesBase.InitializeAllRepositories();
+            // InteractorsBase.InitializeAllInteractors();
+            //
+            // RepositoriesBase.SendOnStartToAllRepositories();
 
-            RepositoriesBase.CreateAllRepositories();
-            InteractorsBase.CreateAllInteractors();
+            Debug.Assert(RepositoriesBase != null, nameof(RepositoriesBase) + " != null");
+            Debug.Assert(InteractorsBase != null, nameof(InteractorsBase) + " != null");
 
             RepositoriesBase.InitializeAllRepositories();
             InteractorsBase.InitializeAllInteractors();
 
             RepositoriesBase.SendOnStartToAllRepositories();
-
-            _offlineIncomeManager = new OfflineIncomeManager();
         }
 
         private void Start()

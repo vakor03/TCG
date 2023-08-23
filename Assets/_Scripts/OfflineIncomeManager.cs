@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace _Scripts
 {
@@ -16,6 +18,7 @@ namespace _Scripts
         private const float MAX_SECONDS_OFFLINE_COUNT = float.MaxValue;
 
         public event Action OnFirstGameEnter;
+
         public bool TryGetTimeFromLastTimeOnline(out float seconds, out TimeSpan difference)
         {
             if (PlayerPrefs.HasKey(LAST_TIME_ONLINE_KEY))
@@ -36,18 +39,28 @@ namespace _Scripts
             }
         }
 
+        private IResourcesRepository _resourcesRepository;
+        private IProductionsRepository _productionsRepository;
+
+        [Inject]
+        public OfflineIncomeManager(IResourcesRepository resourcesRepository,
+            IProductionsRepository productionsRepository)
+        {
+            _resourcesRepository = resourcesRepository;
+            _productionsRepository = productionsRepository;
+        }
+
         public Dictionary<ResourceSO, BigInteger> CalculateOfflineIncome(float seconds)
         {
             var income = new Dictionary<ResourceSO, BigInteger>();
-            var resourcesRepository = RepositoriesHelper.GetRepository<ResourcesRepository>();
-            var productionsRepository = RepositoriesHelper.GetRepository<ProductionsRepository>();
 
-            foreach (var productionSO in productionsRepository.ProductionSOs)
+            foreach (var productionSO in _productionsRepository.ProductionSOs)
             {
-                var productionStats = productionsRepository.GetProductionStats(productionSO);
+                var productionStats = _productionsRepository.GetProductionStats(productionSO);
                 var productionResource = productionSO.ProductionResource;
 
-                var connectedResourceQuantity = resourcesRepository.GetResourceQuantity(productionSO.ConnectedResource);
+                var connectedResourceQuantity =
+                    _resourcesRepository.GetResourceQuantity(productionSO.ConnectedResource);
                 var productionSpeed = productionStats.GetProductionSpeed();
                 var totalSeconds = new BigInteger(seconds);
 
@@ -55,11 +68,26 @@ namespace _Scripts
                 var producedQuantity = connectedResourceQuantity
                                        * productionSpeed
                                        * totalSeconds;
-                
+
                 income.Add(productionResource, producedQuantity);
             }
 
             return income;
+        }
+
+        public List<ProductionSO> GetFinalProductions()
+        {
+            var finalProductions = new List<ProductionSO>();
+            foreach (var productionSO in _productionsRepository.ProductionSOs)
+            {
+                if (_productionsRepository.ProductionSOs.All(so =>
+                        so.ProductionResource != productionSO.ConnectedResource))
+                {
+                    finalProductions.Add(productionSO);
+                }
+            }
+
+            return finalProductions;
         }
 
         public void Save()

@@ -2,12 +2,12 @@
 {
     public interface IRepository
     {
-        void Initialize();
+        public void Initialize();
 
-        void OnStart()
+        public void OnStart()
         {
         }
 
-        void Save();
+        public void Save();
     }
 }

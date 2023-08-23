@@ -5,7 +5,14 @@ using UnityEngine;
 
 namespace _Scripts.Repositories
 {
-    public class ProductionsRepository : IRepository
+    public interface IProductionsRepository : IRepository
+    {
+        List<ProductionSO> ProductionSOs { get; }
+        Production GetProduction(ProductionSO productionsO);
+        ProductionStats GetProductionStats(ProductionSO productionSO);
+    }
+
+    public class ProductionsRepository : IProductionsRepository
     {
         private const string PRODUCTIONS_PATH = "ScriptableObjects/Productions";
         private List<ProductionSO> _productionSOs;
