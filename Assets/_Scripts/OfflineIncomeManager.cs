@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
+using _Scripts.Repositories;
+using _Scripts.ScriptableObjects;
 using UnityEngine;
 
 namespace _Scripts
@@ -12,7 +16,7 @@ namespace _Scripts
         private const float MAX_SECONDS_OFFLINE_COUNT = float.MaxValue;
 
         public event Action OnFirstGameEnter;
-        public bool TryGetTimeFromLastTimeOnline(out double seconds, out TimeSpan difference)
+        public bool TryGetTimeFromLastTimeOnline(out float seconds, out TimeSpan difference)
         {
             if (PlayerPrefs.HasKey(LAST_TIME_ONLINE_KEY))
             {
@@ -30,6 +34,32 @@ namespace _Scripts
                 OnFirstGameEnter?.Invoke();
                 return false;
             }
+        }
+
+        public Dictionary<ResourceSO, BigInteger> CalculateOfflineIncome(float seconds)
+        {
+            var income = new Dictionary<ResourceSO, BigInteger>();
+            var resourcesRepository = RepositoriesHelper.GetRepository<ResourcesRepository>();
+            var productionsRepository = RepositoriesHelper.GetRepository<ProductionsRepository>();
+
+            foreach (var productionSO in productionsRepository.ProductionSOs)
+            {
+                var productionStats = productionsRepository.GetProductionStats(productionSO);
+                var productionResource = productionSO.ProductionResource;
+
+                var connectedResourceQuantity = resourcesRepository.GetResourceQuantity(productionSO.ConnectedResource);
+                var productionSpeed = productionStats.GetProductionSpeed();
+                var totalSeconds = new BigInteger(seconds);
+
+
+                var producedQuantity = connectedResourceQuantity
+                                       * productionSpeed
+                                       * totalSeconds;
+                
+                income.Add(productionResource, producedQuantity);
+            }
+
+            return income;
         }
 
         public void Save()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using _Scripts.Helpers;
 using _Scripts.ScriptableObjects;
 using _Scripts.Upgrades;
 
@@ -22,6 +23,18 @@ namespace _Scripts
             AutoProduction = false;
             ProductionCount = productionSO.ProductionCount;
             ProductionRate = productionSO.BaseProductionRate;
+        }
+
+        public ProductionStats(bool autoProduction, BigInteger productionCount, float productionRate)
+        {
+            AutoProduction = autoProduction;
+            ProductionCount = productionCount;
+            ProductionRate = productionRate;
+        }
+
+        public BigInteger GetProductionSpeed()
+        {
+            return ProductionCount.Divide(ProductionRate, 3);
         }
 
         public void UnlockUpgrade(ProductionUpgrade productionUpgrade)

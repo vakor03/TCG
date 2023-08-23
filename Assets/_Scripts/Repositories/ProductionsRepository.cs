@@ -40,6 +40,11 @@ namespace _Scripts.Repositories
             return _productionsMap[productionsO];
         }
 
+        public ProductionStats GetProductionStats(ProductionSO productionSO)
+        {
+            return _productionStatsMap[productionSO];
+        }
+
         public void Initialize()
         {
             AssembleProductions();

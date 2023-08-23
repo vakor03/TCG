@@ -14,20 +14,20 @@ namespace _Scripts
         public RepositoriesBase RepositoriesBase { get; private set; }
         [SerializeField] private LevelConfigSO firstLevelConfigSO;
         private OfflineIncomeManager _offlineIncomeManager;
-        
+
         protected override void Awake()
         {
             base.Awake();
-            
+
             RepositoriesBase = new RepositoriesBase();
             InteractorsBase = new InteractorsBase();
-            
+
             RepositoriesBase.CreateAllRepositories();
             InteractorsBase.CreateAllInteractors();
-            
+
             RepositoriesBase.InitializeAllRepositories();
             InteractorsBase.InitializeAllInteractors();
-            
+
             RepositoriesBase.SendOnStartToAllRepositories();
 
             _offlineIncomeManager = new OfflineIncomeManager();
@@ -37,16 +37,15 @@ namespace _Scripts
         {
             if (_offlineIncomeManager.TryGetTimeFromLastTimeOnline(out var seconds, out var time))
             {
-                LastTimeOnlineUI.Instance.Show();
-                LastTimeOnlineUI.Instance.Setup(time);
-                Debug.Log("Hello again my friend!");
-                Debug.Log($"You were left for {seconds} seconds");
+                OfflineIncomeUI.Instance.Show();
+                OfflineIncomeUI.Instance.Setup(time, seconds, _offlineIncomeManager);
             }
             else
             {
-                LastTimeOnlineUI.Instance.Hide();
+                OfflineIncomeUI.Instance.Hide();
                 Debug.Log("First time playing?");
             }
+
             foreach (var production in firstLevelConfigSO.ProductionsAvailable)
             {
                 ProductionsGroup.Instance.AddProduction(production);

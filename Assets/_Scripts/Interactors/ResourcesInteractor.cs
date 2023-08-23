@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
@@ -48,6 +49,14 @@ namespace _Scripts.Interactors
             _resourcesRepository.ResourcesQuantityMap[resource] = newValue;
 
             OnResourceQuantityChanged?.Invoke(resource);
+        }
+
+        public void AddResources(Dictionary<ResourceSO, BigInteger> income)
+        {
+            foreach (var (resourceSO, quantity) in income)
+            {
+                AddResource(resourceSO, quantity);
+            }
         }
     }
 }
