@@ -10,7 +10,6 @@ namespace _Scripts.Repositories
         public void CreateAllRepositories()
         {
             CreateRepository<ResourcesRepository>();
-            CreateRepository<MarketRepository>();
         }
         
         private void CreateRepository<T>() where T : IRepository, new()

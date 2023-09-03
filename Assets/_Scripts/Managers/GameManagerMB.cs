@@ -11,7 +11,7 @@ using Zenject;
 
 #endregion
 
-namespace _Scripts
+namespace _Scripts.Managers
 {
     public class GameManagerMB : StaticInstance<GameManagerMB>
     {

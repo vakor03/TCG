@@ -1,4 +1,4 @@
-﻿namespace _Scripts.UI
+﻿namespace _Scripts.Managers
 {
     public struct ShopOption
     {

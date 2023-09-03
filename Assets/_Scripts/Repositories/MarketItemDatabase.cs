@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using _Scripts.Core.MarketItems;
 using _Scripts.Helpers;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
+using Zenject;
 
 namespace _Scripts.Repositories
 {
-    public interface IMarketRepository: IRepository
-    {
-        MarketItem GetMarketItem(ResourceSO resourceSO);
-        bool TryGetMarketItem(ResourceSO resourceSO, out MarketItem marketItem);
-    }
-
-    public class MarketRepository : IRepository
+    public class MarketItemDatabase : IInitializable
     {
         private const string MARKET_ITEM_PATH = "ScriptableObjects/MarketItems";
 
@@ -40,10 +36,6 @@ namespace _Scripts.Repositories
         public void Initialize()
         {
             AssembleResources();
-        }
-
-        public void Save()
-        {
         }
     }
 }

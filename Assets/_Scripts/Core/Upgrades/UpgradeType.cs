@@ -1,4 +1,6 @@
-﻿namespace _Scripts.Upgrades
+﻿using _Scripts.Core.Productions;
+
+namespace _Scripts.Core.Upgrades
 {
     public enum UpgradeType
     {

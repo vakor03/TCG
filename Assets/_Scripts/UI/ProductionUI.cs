@@ -1,5 +1,6 @@
 ﻿#region
 
+using _Scripts.Core.Productions;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
@@ -26,17 +27,17 @@ namespace _Scripts.UI
         private Production _production;
         private ProductionSO _productionSO;
 
-        private ProductionContainer _productionContainer;
+        private ProductionDatabase _productionDatabase;
         private ResourcesInteractor _resourcesInteractor;
         
         private InteractorsBase _interactorsBase;
 
         [Inject]
         public void Construct(InteractorsBase interactorsBase,
-            ProductionContainer productionContainer)
+            ProductionDatabase productionDatabase)
         {
             _interactorsBase = interactorsBase;
-            _productionContainer = productionContainer;
+            _productionDatabase = productionDatabase;
         }
 
         public void Init(ProductionSO productionSO)
@@ -49,7 +50,7 @@ namespace _Scripts.UI
             _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
             
             buyResourceButtonUI.Init(_productionSO.ConnectedResource);
-            _production = _productionContainer.GetProduction(_productionSO);
+            _production = _productionDatabase.GetProduction(_productionSO);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
@@ -103,7 +104,7 @@ namespace _Scripts.UI
 
         private void ProducerOnProductionStarted()
         {
-            progressBarUI.FillAndReset(_productionContainer
+            progressBarUI.FillAndReset(_productionDatabase
                 .GetProduction(_productionSO).ProductionRate);
         }
 

@@ -9,7 +9,7 @@ using MEC;
 
 #endregion
 
-namespace _Scripts
+namespace _Scripts.Core.Productions
 {
     public class Production : IDisposable
     {

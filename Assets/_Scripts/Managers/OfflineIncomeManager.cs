@@ -6,9 +6,8 @@ using System.Numerics;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
-using Zenject;
 
-namespace _Scripts
+namespace _Scripts.Managers
 {
     public class OfflineIncomeManager
     {
@@ -40,13 +39,13 @@ namespace _Scripts
         }
 
         private ResourcesRepository _resourcesRepository;
-        private ProductionContainer _productionContainer;
+        private ProductionDatabase _productionDatabase;
         
         private OfflineIncomeManager(RepositoriesBase repositoriesBase,
-            ProductionContainer productionContainer)
+            ProductionDatabase productionDatabase)
         {
             _resourcesRepository = repositoriesBase.GetRepository<ResourcesRepository>();
-            _productionContainer = productionContainer;
+            _productionDatabase = productionDatabase;
         }
 
 
@@ -54,9 +53,9 @@ namespace _Scripts
         {
             var income = new Dictionary<ResourceSO, BigInteger>();
 
-            foreach (var productionSO in _productionContainer.ProductionSOs)
+            foreach (var productionSO in _productionDatabase.ProductionSOs)
             {
-                var productionStats = _productionContainer.GetProductionStats(productionSO);
+                var productionStats = _productionDatabase.GetProductionStats(productionSO);
                 var productionResource = productionSO.ProductionResource;
 
                 var connectedResourceQuantity =
@@ -78,9 +77,9 @@ namespace _Scripts
         public List<ProductionSO> GetFinalProductions()
         {
             var finalProductions = new List<ProductionSO>();
-            foreach (var productionSO in _productionContainer.ProductionSOs)
+            foreach (var productionSO in _productionDatabase.ProductionSOs)
             {
-                if (_productionContainer.ProductionSOs.All(so =>
+                if (_productionDatabase.ProductionSOs.All(so =>
                         so.ProductionResource != productionSO.ConnectedResource))
                 {
                     finalProductions.Add(productionSO);

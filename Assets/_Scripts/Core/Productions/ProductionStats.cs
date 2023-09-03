@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using _Scripts.Core.Upgrades;
 using _Scripts.Helpers;
 using _Scripts.ScriptableObjects;
-using _Scripts.Upgrades;
 
-namespace _Scripts
+namespace _Scripts.Core.Productions
 {
     public class ProductionStats
     {

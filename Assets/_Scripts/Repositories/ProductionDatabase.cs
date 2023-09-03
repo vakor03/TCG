@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using _Scripts.Core.Productions;
 using _Scripts.Factories;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
@@ -7,7 +8,7 @@ using Zenject;
 
 namespace _Scripts.Repositories
 {
-    public class ProductionContainer : IInitializable
+    public class ProductionDatabase : IInitializable
     {
         private const string PRODUCTIONS_PATH = "ScriptableObjects/Productions";
         private List<ProductionSO> _productionSOs;
@@ -17,7 +18,7 @@ namespace _Scripts.Repositories
         private readonly IProductionFactory _productionFactory;
         public List<ProductionSO> ProductionSOs => _productionSOs;
 
-        public ProductionContainer(IProductionFactory productionFactory)
+        public ProductionDatabase(IProductionFactory productionFactory)
         {
             _productionFactory = productionFactory;
         }

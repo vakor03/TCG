@@ -1,40 +1,30 @@
 ﻿#region
 
 using System.Numerics;
-using _Scripts.Helpers;
+using _Scripts.Core.MarketItems;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
 using UnityEngine;
-using Zenject;
 
 #endregion
 
 namespace _Scripts.Managers
 {
-    public class Shop : StaticInstance<Shop>
+    public class Shop
     {
-        private InteractorsBase _interactorsBase;
-        private MarketRepository _marketRepository;
-        private RepositoriesBase _repositoriesBase;
+        private MarketItemDatabase _marketItemDatabase;
         private ResourcesInteractor _resourcesInteractor;
         private ShopOptionManager _shopOptionManager;
 
-        [Inject]
-        public void Construct(RepositoriesBase repositoriesBase, 
-            InteractorsBase interactorsBase,
+        private Shop(MarketItemDatabase marketItemDatabase, 
+            ResourcesInteractor resourcesInteractor, 
             ShopOptionManager shopOptionManager)
         {
-            _repositoriesBase = repositoriesBase;
-            _interactorsBase = interactorsBase;
+            _marketItemDatabase = marketItemDatabase;
+            _resourcesInteractor = resourcesInteractor;
             _shopOptionManager = shopOptionManager;
-        }
-
-        private void Start()
-        {
-            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
-            _marketRepository = _repositoriesBase.GetRepository<MarketRepository>();
         }
 
         public BigInteger CalculateCurrentBuyQuantity(ResourceSO resourceSO)
@@ -81,7 +71,7 @@ namespace _Scripts.Managers
 
         public BigInteger FindMaxPossibleBuyCount(ResourceSO resourceSO)
         {
-            if (_marketRepository.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 BigInteger max;
                 bool firstValue = true;
@@ -110,7 +100,7 @@ namespace _Scripts.Managers
 
         public bool TryBuyResource(ResourceSO resourceSO, BigInteger quantity)
         {
-            if (_marketRepository.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 if (!CheckEnoughResourcesToBuy(marketItemSO, quantity))
                 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace _Scripts.Upgrades
+namespace _Scripts.Core.Upgrades
 {
     public class ProductionModifiers
     {

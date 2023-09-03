@@ -1,11 +1,12 @@
-﻿using _Scripts.Factories;
+﻿using _Scripts.Core.Productions;
+using _Scripts.Factories;
 using _Scripts.Interactors;
 using _Scripts.Managers;
 using _Scripts.Repositories;
 using UnityEngine;
 using Zenject;
 
-namespace _Scripts
+namespace _Scripts.DI.Installers
 {
     public class GameInstaller : MonoInstaller
     {
@@ -22,8 +23,24 @@ namespace _Scripts
             BindProductionUIFactory();
 
             BindProductionFactory();
-            
+
             BindProductionContainer();
+
+            BindShop();
+            
+            BindMarketItemDatabase();
+        }
+
+        private void BindMarketItemDatabase()
+        {
+            Container
+                .BindInterfacesAndSelfTo<MarketItemDatabase>()
+                .AsSingle();
+        }
+
+        private void BindShop()
+        {
+            Container.Bind<Shop>().AsSingle();
         }
 
         private void BindProductionFactory()
@@ -48,7 +65,7 @@ namespace _Scripts
         private void BindProductionContainer()
         {
             Container
-                .BindInterfacesAndSelfTo<ProductionContainer>()
+                .BindInterfacesAndSelfTo<ProductionDatabase>()
                 .AsSingle();
         }
 

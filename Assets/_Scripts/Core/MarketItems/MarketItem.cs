@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using _Scripts.ScriptableObjects;
 
-namespace _Scripts
+namespace _Scripts.Core.MarketItems
 {
     public class MarketItem
     {

@@ -1,7 +1,7 @@
 ﻿using _Scripts.UI;
 using UnityEngine;
 
-namespace _Scripts
+namespace _Scripts.Core.Productions
 {
     public class ProductionUIContainerMB : MonoBehaviour
     {

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using _Scripts.Core.Productions;
 
-namespace _Scripts.Upgrades
+namespace _Scripts.Core.Upgrades
 {
     public abstract class Upgrade
     {
