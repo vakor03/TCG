@@ -16,6 +16,10 @@ namespace _Scripts.Repositories
         private Dictionary<ResourceSO, MarketItemSO> _marketItemSOsMap;
         private Dictionary<ResourceSO, MarketItem> _marketItemsMap;
 
+        private MarketItemDatabase()
+        {
+        }
+
         public MarketItem GetMarketItem(ResourceSO resourceSO)
         {
             return _marketItemsMap[resourceSO];

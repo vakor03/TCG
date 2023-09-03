@@ -14,13 +14,9 @@ namespace _Scripts.DI.Installers
 
         public override void InstallBindings()
         {
-            Container
-                .BindInterfacesAndSelfTo<ResourcesRepository>()
-                .AsSingle();
+            BindResourcesRepository();
 
-            Container
-                .Bind<ResourcesInteractor>()
-                .AsSingle();
+            BindResourcesInteractor();
 
             BindOfflineIncomeManager();
 
@@ -35,6 +31,20 @@ namespace _Scripts.DI.Installers
             BindShop();
             
             BindMarketItemDatabase();
+        }
+
+        private void BindResourcesInteractor()
+        {
+            Container
+                .Bind<ResourcesInteractor>()
+                .AsSingle();
+        }
+
+        private void BindResourcesRepository()
+        {
+            Container
+                .BindInterfacesAndSelfTo<ResourcesRepository>()
+                .AsSingle();
         }
 
         private void BindMarketItemDatabase()

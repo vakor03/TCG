@@ -18,7 +18,7 @@ namespace _Scripts.Repositories
         private readonly IProductionFactory _productionFactory;
         public List<ProductionSO> ProductionSOs => _productionSOs;
 
-        public ProductionDatabase(IProductionFactory productionFactory)
+        private ProductionDatabase(IProductionFactory productionFactory)
         {
             _productionFactory = productionFactory;
         }
@@ -34,14 +34,6 @@ namespace _Scripts.Repositories
                     so.ProductionResource,
                     so.ConnectedResource);
             });
-        }
-
-        public void OnStart()
-        {
-            foreach (var production in _productionsMap.Values)
-            {
-                production.OnStart();
-            }
         }
 
         public Production GetProduction(ProductionSO productionsO)
