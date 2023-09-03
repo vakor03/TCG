@@ -6,31 +6,16 @@ using _Scripts.ScriptableObjects;
 
 namespace _Scripts.Interactors
 {
-    // public interface IResourcesInteractor : IInteractor
-    // {
-    //     event Action<ResourceSO> OnResourceQuantityChanged;
-    //     BigInteger GetResourceQuantity(ResourceSO resource);
-    //     void SpendResource(ResourceSO resourceSO, BigInteger quantity);
-    //     void AddResource(ResourceSO resourceSO, BigInteger quantity);
-    //     bool IsEnoughResource(ResourceSO resourceSO, BigInteger quantity);
-    //     void AddResources(Dictionary<ResourceSO, BigInteger> income);
-    // }
-
-    public class ResourcesInteractor : IInteractor
+    public class ResourcesInteractor
     {
-        public static ResourcesInteractor Instance { get; private set; }
-        public ResourcesInteractor()
+        private readonly ResourcesRepository _resourcesRepository;
+
+        private ResourcesInteractor(ResourcesRepository resourcesRepository)
         {
-            Instance = this;
+            _resourcesRepository = resourcesRepository;
         }
-        private ResourcesRepository _resourcesRepository { get; set; }
 
         public event Action<ResourceSO> OnResourceQuantityChanged;
-        
-        public void Initialize(RepositoriesBase repositoriesBase)
-        {
-            _resourcesRepository = repositoriesBase.GetRepository<ResourcesRepository>();
-        }
 
         public BigInteger GetResourceQuantity(ResourceSO resource)
         {

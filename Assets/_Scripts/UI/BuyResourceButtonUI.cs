@@ -23,16 +23,16 @@ namespace _Scripts.UI
 
         private ResourcesInteractor _resourcesInteractor;
         private ResourceSO _resourceSO;
-        private InteractorsBase _interactorsBase;
+        
         private ShopOptionManager _shopOptionManager;
         private Shop _shop;
 
         [Inject]
-        public void Construct(InteractorsBase interactorsBase,
+        public void Construct(ResourcesInteractor resourcesInteractor,
             ShopOptionManager shopOptionManager,
             Shop shop)
         {
-            _interactorsBase = interactorsBase;
+            _resourcesInteractor = resourcesInteractor;
             _shopOptionManager = shopOptionManager;
             _shop = shop;
         }
@@ -44,8 +44,6 @@ namespace _Scripts.UI
 
         private void Start()
         {
-            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
-
             buyButton.onClick.AddListener(BuyProducer);
 
             _shopOptionManager.OnShopOptionChanged += RecalculateCurrentBuyQuantity;

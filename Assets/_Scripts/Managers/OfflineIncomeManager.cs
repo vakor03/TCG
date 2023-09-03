@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,14 +9,26 @@ using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
 
+#endregion
+
 namespace _Scripts.Managers
 {
     public class OfflineIncomeManager
     {
-        private readonly string _dateTimeFormat = "u";
-        private readonly CultureInfo _dateTimeCulture = CultureInfo.InvariantCulture;
         private const string LAST_TIME_ONLINE_KEY = "LAST_TIME_OFFLINE_KEY";
         private const float MAX_SECONDS_OFFLINE_COUNT = float.MaxValue;
+        private readonly CultureInfo _dateTimeCulture = CultureInfo.InvariantCulture;
+        private readonly string _dateTimeFormat = "u";
+        private ProductionDatabase _productionDatabase;
+
+        private ResourcesRepository _resourcesRepository;
+
+        private OfflineIncomeManager(ResourcesRepository resourcesRepository,
+            ProductionDatabase productionDatabase)
+        {
+            _resourcesRepository = resourcesRepository;
+            _productionDatabase = productionDatabase;
+        }
 
         public event Action OnFirstGameEnter;
 
@@ -36,16 +50,6 @@ namespace _Scripts.Managers
                 OnFirstGameEnter?.Invoke();
                 return false;
             }
-        }
-
-        private ResourcesRepository _resourcesRepository;
-        private ProductionDatabase _productionDatabase;
-        
-        private OfflineIncomeManager(RepositoriesBase repositoriesBase,
-            ProductionDatabase productionDatabase)
-        {
-            _resourcesRepository = repositoriesBase.GetRepository<ResourcesRepository>();
-            _productionDatabase = productionDatabase;
         }
 
 

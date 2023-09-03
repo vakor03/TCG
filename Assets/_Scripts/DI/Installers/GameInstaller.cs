@@ -14,7 +14,13 @@ namespace _Scripts.DI.Installers
 
         public override void InstallBindings()
         {
-            BindRepositoriesBaseAndInteractorsBase();
+            Container
+                .BindInterfacesAndSelfTo<ResourcesRepository>()
+                .AsSingle();
+
+            Container
+                .Bind<ResourcesInteractor>()
+                .AsSingle();
 
             BindOfflineIncomeManager();
 
@@ -78,29 +84,6 @@ namespace _Scripts.DI.Installers
         private void BindOfflineIncomeManager()
         {
             Container.Bind<OfflineIncomeManager>()
-                .AsSingle();
-        }
-
-        private void BindRepositoriesBaseAndInteractorsBase()
-        {
-            RepositoriesBase repositoriesBase = new RepositoriesBase();
-            InteractorsBase interactorsBase = new InteractorsBase(repositoriesBase);
-
-            repositoriesBase.CreateAllRepositories();
-            interactorsBase.CreateAllInteractors();
-
-            Container
-                .Bind<RepositoriesBase>()
-                .FromInstance(repositoriesBase)
-                .AsSingle();
-
-            Container
-                .Bind<InteractorsBase>()
-                .FromInstance(interactorsBase)
-                .AsSingle();
-
-            Container.Bind<ResourcesInteractor>()
-                .FromInstance(interactorsBase.GetInteractor<ResourcesInteractor>())
                 .AsSingle();
         }
     }

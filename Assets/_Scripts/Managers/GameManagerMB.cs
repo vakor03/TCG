@@ -19,18 +19,7 @@ namespace _Scripts.Managers
         private OfflineIncomeManager _offlineIncomeManager;
 
         private IProductionUIFactory _productionUIFactory;
-        private InteractorsBase InteractorsBase { get; set; }
-        private RepositoriesBase RepositoriesBase { get; set; }
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            RepositoriesBase.InitializeAllRepositories();
-            InteractorsBase.InitializeAllInteractors();
-
-            RepositoriesBase.SendOnStartToAllRepositories();
-        }
+        private ResourcesRepository _resourcesRepository;
 
         private void Start()
         {
@@ -56,23 +45,21 @@ namespace _Scripts.Managers
             if (Input.GetKeyDown(KeyCode.S))
             {
                 _offlineIncomeManager.Save();
-                RepositoriesBase.SaveAllRepositories();
+                _resourcesRepository.Save();
             }
         }
 
         protected override void OnApplicationQuit()
         {
-            RepositoriesBase.SaveAllRepositories();
+            _resourcesRepository.Save();
         }
 
         [Inject]
-        public void Construct(RepositoriesBase repositoriesBase,
-            InteractorsBase interactorsBase,
+        public void Construct(ResourcesRepository resourcesRepository,
             OfflineIncomeManager offlineIncomeManager,
             IProductionUIFactory productionUIFactory)
         {
-            RepositoriesBase = repositoriesBase;
-            InteractorsBase = interactorsBase;
+            _resourcesRepository = resourcesRepository;
             _offlineIncomeManager = offlineIncomeManager;
             _productionUIFactory = productionUIFactory;
         }

@@ -17,18 +17,15 @@ namespace _Scripts.UI
         [SerializeField] private ResourceSO resourceSO;
 
         private ResourcesInteractor _resourcesInteractor;
-        private InteractorsBase _interactorsBase;
 
         [Inject]
-        public void Construct(InteractorsBase interactorsBase)
+        public void Construct(ResourcesInteractor resourcesInteractor)
         {
-            _interactorsBase = interactorsBase;
+            _resourcesInteractor = resourcesInteractor;
         }
 
         private void Start()
         {
-            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
-
             _resourcesInteractor.OnResourceQuantityChanged +=
                 ResourcesRepositoryOnResourceQuantityChanged;
 

@@ -30,13 +30,11 @@ namespace _Scripts.UI
         private ProductionDatabase _productionDatabase;
         private ResourcesInteractor _resourcesInteractor;
         
-        private InteractorsBase _interactorsBase;
-
         [Inject]
-        public void Construct(InteractorsBase interactorsBase,
+        public void Construct(ResourcesInteractor resourcesInteractor,
             ProductionDatabase productionDatabase)
         {
-            _interactorsBase = interactorsBase;
+            _resourcesInteractor = resourcesInteractor;
             _productionDatabase = productionDatabase;
         }
 
@@ -47,8 +45,7 @@ namespace _Scripts.UI
 
         private void Start()
         {
-            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
-            
+           
             buyResourceButtonUI.Init(_productionSO.ConnectedResource);
             _production = _productionDatabase.GetProduction(_productionSO);
 

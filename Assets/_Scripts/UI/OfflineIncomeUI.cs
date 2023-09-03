@@ -19,12 +19,11 @@ namespace _Scripts.UI
         [SerializeField] private Button closeButton;
 
         private ResourcesInteractor _resourcesInteractor;
-        private InteractorsBase _interactorsBase;
 
         [Inject]
-        public void Construct(InteractorsBase interactorsBase)
+        public void Construct(ResourcesInteractor resourcesInteractor)
         {
-            _interactorsBase = interactorsBase;
+            _resourcesInteractor = resourcesInteractor;
         }
 
         protected override void Awake()
@@ -34,12 +33,7 @@ namespace _Scripts.UI
             closeButton.onClick.AddListener(Hide);
             Hide();
         }
-
-        private void Start()
-        {
-            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
-        }
-
+      
         public void Setup(TimeSpan timeElapsed, float totalSeconds, OfflineIncomeManager offlineIncomeManager)
         {
             text.text = FormatTimeSpan(timeElapsed) + "\n" + totalSeconds + " seconds";
