@@ -1,9 +1,13 @@
-﻿using _Scripts.Helpers;
+﻿#region
+
+using _Scripts.Helpers;
 using _Scripts.Interactors;
-using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
+using Zenject;
+
+#endregion
 
 namespace _Scripts.UI
 {
@@ -12,9 +16,21 @@ namespace _Scripts.UI
         [SerializeField] private TextMeshProUGUI countText;
         [SerializeField] private ResourceSO resourceSO;
 
+        private ResourcesInteractor _resourcesInteractor;
+        private InteractorsBase _interactorsBase;
+
+        [Inject]
+        public void Construct(InteractorsBase interactorsBase)
+        {
+            _interactorsBase = interactorsBase;
+        }
+
         private void Start()
         {
-            InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
+
+            _resourcesInteractor.OnResourceQuantityChanged +=
+                ResourcesRepositoryOnResourceQuantityChanged;
 
             UpdateCountText();
         }
@@ -29,7 +45,7 @@ namespace _Scripts.UI
 
         private void UpdateCountText()
         {
-            countText.text = InteractorsHelper.GetInteractor<ResourcesInteractor>().GetResourceQuantity(resourceSO)
+            countText.text = _resourcesInteractor.GetResourceQuantity(resourceSO)
                 .ToScientificNotationString();
         }
     }

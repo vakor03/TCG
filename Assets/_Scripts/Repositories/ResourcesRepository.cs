@@ -16,7 +16,7 @@ namespace _Scripts.Repositories
         BigInteger GetResourceQuantity(ResourceSO resource);
     }
 
-    public class ResourcesRepository : IResourcesRepository
+    public class ResourcesRepository : IRepository
     {
         private const string PLAYER_PREFS_RESOURCES_PREFIX = "RES_KEY_";
         private const string RESOURCES_PATH = "ScriptableObjects/Resources";

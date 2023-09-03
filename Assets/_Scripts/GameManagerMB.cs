@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using _Scripts.Factories;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
@@ -7,33 +9,22 @@ using _Scripts.UI;
 using UnityEngine;
 using Zenject;
 
+#endregion
+
 namespace _Scripts
 {
-    public class GameManager : StaticInstance<GameManager>
+    public class GameManagerMB : StaticInstance<GameManagerMB>
     {
-        [Inject] public InteractorsBase InteractorsBase { get; private set; }
-        [Inject] public RepositoriesBase RepositoriesBase { get; private set; }
-        [Inject] private OfflineIncomeManager _offlineIncomeManager;
-
         [SerializeField] private LevelConfigSO firstLevelConfigSO;
+        private OfflineIncomeManager _offlineIncomeManager;
+
+        private IProductionUIFactory _productionUIFactory;
+        private InteractorsBase InteractorsBase { get; set; }
+        private RepositoriesBase RepositoriesBase { get; set; }
 
         protected override void Awake()
         {
             base.Awake();
-
-            // RepositoriesBase = new RepositoriesBase();
-            // InteractorsBase = new InteractorsBase();
-            //
-            // RepositoriesBase.CreateAllRepositories();
-            // InteractorsBase.CreateAllInteractors();
-            //
-            // RepositoriesBase.InitializeAllRepositories();
-            // InteractorsBase.InitializeAllInteractors();
-            //
-            // RepositoriesBase.SendOnStartToAllRepositories();
-
-            Debug.Assert(RepositoriesBase != null, nameof(RepositoriesBase) + " != null");
-            Debug.Assert(InteractorsBase != null, nameof(InteractorsBase) + " != null");
 
             RepositoriesBase.InitializeAllRepositories();
             InteractorsBase.InitializeAllInteractors();
@@ -54,9 +45,9 @@ namespace _Scripts
                 Debug.Log("First time playing?");
             }
 
-            foreach (var production in firstLevelConfigSO.ProductionsAvailable)
+            foreach (var productionSO in firstLevelConfigSO.ProductionsAvailable)
             {
-                ProductionsGroup.Instance.AddProduction(production);
+                _productionUIFactory.Create(productionSO);
             }
         }
 
@@ -69,9 +60,21 @@ namespace _Scripts
             }
         }
 
-        private void OnApplicationQuit()
+        protected override void OnApplicationQuit()
         {
             RepositoriesBase.SaveAllRepositories();
+        }
+
+        [Inject]
+        public void Construct(RepositoriesBase repositoriesBase,
+            InteractorsBase interactorsBase,
+            OfflineIncomeManager offlineIncomeManager,
+            IProductionUIFactory productionUIFactory)
+        {
+            RepositoriesBase = repositoriesBase;
+            InteractorsBase = interactorsBase;
+            _offlineIncomeManager = offlineIncomeManager;
+            _productionUIFactory = productionUIFactory;
         }
     }
 }

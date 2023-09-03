@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace _Scripts.Repositories
 {
+    public interface IMarketRepository: IRepository
+    {
+        MarketItem GetMarketItem(ResourceSO resourceSO);
+        bool TryGetMarketItem(ResourceSO resourceSO, out MarketItem marketItem);
+    }
+
     public class MarketRepository : IRepository
     {
         private const string MARKET_ITEM_PATH = "ScriptableObjects/MarketItems";

@@ -39,24 +39,24 @@ namespace _Scripts
             }
         }
 
-        private IResourcesRepository _resourcesRepository;
-        private IProductionsRepository _productionsRepository;
-
-        [Inject]
-        public OfflineIncomeManager(IResourcesRepository resourcesRepository,
-            IProductionsRepository productionsRepository)
+        private ResourcesRepository _resourcesRepository;
+        private ProductionContainer _productionContainer;
+        
+        private OfflineIncomeManager(RepositoriesBase repositoriesBase,
+            ProductionContainer productionContainer)
         {
-            _resourcesRepository = resourcesRepository;
-            _productionsRepository = productionsRepository;
+            _resourcesRepository = repositoriesBase.GetRepository<ResourcesRepository>();
+            _productionContainer = productionContainer;
         }
+
 
         public Dictionary<ResourceSO, BigInteger> CalculateOfflineIncome(float seconds)
         {
             var income = new Dictionary<ResourceSO, BigInteger>();
 
-            foreach (var productionSO in _productionsRepository.ProductionSOs)
+            foreach (var productionSO in _productionContainer.ProductionSOs)
             {
-                var productionStats = _productionsRepository.GetProductionStats(productionSO);
+                var productionStats = _productionContainer.GetProductionStats(productionSO);
                 var productionResource = productionSO.ProductionResource;
 
                 var connectedResourceQuantity =
@@ -78,9 +78,9 @@ namespace _Scripts
         public List<ProductionSO> GetFinalProductions()
         {
             var finalProductions = new List<ProductionSO>();
-            foreach (var productionSO in _productionsRepository.ProductionSOs)
+            foreach (var productionSO in _productionContainer.ProductionSOs)
             {
-                if (_productionsRepository.ProductionSOs.All(so =>
+                if (_productionContainer.ProductionSOs.All(so =>
                         so.ProductionResource != productionSO.ConnectedResource))
                 {
                     finalProductions.Add(productionSO);

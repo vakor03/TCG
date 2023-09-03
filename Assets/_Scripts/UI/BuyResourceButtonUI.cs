@@ -1,35 +1,52 @@
-﻿using System.Numerics;
+﻿#region
+
+using System.Numerics;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Managers;
-using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
+
+#endregion
 
 namespace _Scripts.UI
 {
     public class BuyResourceButtonUI : MonoBehaviour
     {
-        private ResourceSO _resourceSO;
         [SerializeField] private Button buyButton;
         [SerializeField] private TextMeshProUGUI buyButtonText;
 
         private BigInteger _currentBuyQuantity;
 
-        private void Start()
+        private ResourcesInteractor _resourcesInteractor;
+        private ResourceSO _resourceSO;
+        private InteractorsBase _interactorsBase;
+        private ShopOptionManager _shopOptionManager;
+
+        [Inject]
+        public void Construct(InteractorsBase interactorsBase,
+            ShopOptionManager shopOptionManager)
         {
+            _interactorsBase = interactorsBase;
+            _shopOptionManager = shopOptionManager;
         }
 
         public void Init(ResourceSO resourceSO)
         {
             _resourceSO = resourceSO;
+        }
+
+        private void Start()
+        {
+            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
+          
             buyButton.onClick.AddListener(BuyProducer);
 
-            Shop.Instance.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
-            InteractorsHelper.GetInteractor<ResourcesInteractor>()
-                .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
+            _shopOptionManager.OnShopOptionChanged += RecalculateCurrentBuyQuantity;
+            _resourcesInteractor.OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
 
             RecalculateCurrentBuyQuantity();
         }

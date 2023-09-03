@@ -1,8 +1,10 @@
-﻿namespace _Scripts.Interactors
+﻿using _Scripts.Repositories;
+
+namespace _Scripts.Interactors
 {
     public interface IInteractor
     {
-        public void Initialize()
+        public void Initialize(RepositoriesBase repositoriesBase)
         {}
     }
 }

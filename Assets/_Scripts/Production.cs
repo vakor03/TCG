@@ -13,16 +13,21 @@ namespace _Scripts
 {
     public class Production : IDisposable
     {
+        private ResourceSO _connectedResource;
         private CoroutineHandle _currentProductionCoroutine;
         private State _currentState;
+        private ResourceSO _productedResource;
 
         private BigInteger _productionCount;
 
         private ProductionStats _productionStats;
-        private ResourceSO _productedResource;
-        private ResourceSO _connectedResource;
+        public ResourcesInteractor _resourcesInteractor;
 
-        public Production(ProductionStats productionStats, ResourceSO productedResource, ResourceSO connectedResource)
+        
+        public Production(ProductionStats productionStats, 
+            ResourceSO productedResource, 
+            ResourceSO connectedResource,
+            ResourcesInteractor resourcesInteractor)
         {
             _currentState = State.Stopped;
             _productionStats = productionStats;
@@ -32,6 +37,27 @@ namespace _Scripts
             _productionStats.OnAutoProductionChanged += ProductionStatsOnAutoProductionChanged;
             _productionStats.OnProductionRateChanged += () => OnProductionRateChanged?.Invoke();
             _productionStats.OnProductionCountChanged += UpdateProductionCount;
+            
+            _resourcesInteractor = resourcesInteractor;
+            
+            OnStart();
+        }
+
+        public BigInteger ProductionCount
+        {
+            get => _productionCount;
+            private set
+            {
+                _productionCount = value;
+                OnProductionCountChanged?.Invoke();
+            }
+        }
+
+        public float ProductionRate => _productionStats.ProductionRate;
+
+        public void Dispose()
+        {
+            _resourcesInteractor.OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
         }
 
         private void ProductionStatsOnAutoProductionChanged(bool value)
@@ -47,18 +73,6 @@ namespace _Scripts
             }
         }
 
-        public BigInteger ProductionCount
-        {
-            get => _productionCount;
-            private set
-            {
-                _productionCount = value;
-                OnProductionCountChanged?.Invoke();
-            }
-        }
-
-        public float ProductionRate => _productionStats.ProductionRate;
-
         public event Action OnProductionFinished;
 
         public event Action OnProductionStarted;
@@ -69,12 +83,12 @@ namespace _Scripts
 
         public void OnStart()
         {
-            InteractorsHelper.GetInteractor<ResourcesInteractor>()
+            _resourcesInteractor
                 .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
 
-            // ProductionRate = _productionSO.BaseProductionRate;
             UpdateProductionCount();
         }
+
 
         private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
         {
@@ -84,14 +98,9 @@ namespace _Scripts
             }
         }
 
-        public void Dispose()
-        {
-            InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
-        }
-
         private void UpdateProductionCount()
         {
-            ProductionCount = InteractorsHelper.GetInteractor<ResourcesInteractor>().GetResourceQuantity(_connectedResource) *
+            ProductionCount = _resourcesInteractor.GetResourceQuantity(_connectedResource) *
                               _productionStats.ProductionCount;
         }
 
@@ -117,7 +126,7 @@ namespace _Scripts
 
             yield return Timing.WaitForSeconds(_productionStats.ProductionRate);
 
-            InteractorsHelper.GetInteractor<ResourcesInteractor>().AddResource(_productedResource, ProductionCount);
+            _resourcesInteractor.AddResource(_productedResource, ProductionCount);
 
             OnProductionFinished?.Invoke();
             _currentState = State.Stopped;

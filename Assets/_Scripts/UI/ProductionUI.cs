@@ -7,6 +7,7 @@ using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 #endregion
 
@@ -25,18 +26,37 @@ namespace _Scripts.UI
         private Production _production;
         private ProductionSO _productionSO;
 
+        private ProductionContainer _productionContainer;
+        private ResourcesInteractor _resourcesInteractor;
+        
+        private InteractorsBase _interactorsBase;
+
+        [Inject]
+        public void Construct(InteractorsBase interactorsBase,
+            ProductionContainer productionContainer)
+        {
+            _interactorsBase = interactorsBase;
+            _productionContainer = productionContainer;
+        }
+
         public void Init(ProductionSO productionSO)
         {
-            buyResourceButtonUI.Init(productionSO.ConnectedResource);
             _productionSO = productionSO;
-            _production = RepositoriesHelper.GetRepository<ProductionsRepository>().GetProduction(productionSO);
+        }
+
+        private void Start()
+        {
+            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
+            
+            buyResourceButtonUI.Init(_productionSO.ConnectedResource);
+            _production = _productionContainer.GetProduction(_productionSO);
 
             _production.OnProductionStarted += ProducerOnProductionStarted;
             _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
             _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
-            InteractorsHelper.GetInteractor<ResourcesInteractor>().OnResourceQuantityChanged +=
+            _resourcesInteractor.OnResourceQuantityChanged +=
                 ResourcesRepositoryOnResourceQuantityChanged;
-  
+
             progressBarUI.Button.onClick.AddListener(StartProduction);
 
             SetDefaultValues();
@@ -68,7 +88,7 @@ namespace _Scripts.UI
 
         private void SetResourceCountText()
         {
-            countText.text = GameManager.Instance.InteractorsBase.GetInteractor<ResourcesInteractor>()
+            countText.text = _resourcesInteractor
                 .GetResourceQuantity(_productionSO.ConnectedResource).ToScientificNotationString();
         }
 
@@ -83,7 +103,7 @@ namespace _Scripts.UI
 
         private void ProducerOnProductionStarted()
         {
-            progressBarUI.FillAndReset(RepositoriesHelper.GetRepository<ProductionsRepository>()
+            progressBarUI.FillAndReset(_productionContainer
                 .GetProduction(_productionSO).ProductionRate);
         }
 

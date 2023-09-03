@@ -1,47 +1,90 @@
-﻿using _Scripts.Interactors;
+﻿using _Scripts.Factories;
+using _Scripts.Interactors;
+using _Scripts.Managers;
 using _Scripts.Repositories;
+using UnityEngine;
 using Zenject;
 
 namespace _Scripts
 {
     public class GameInstaller : MonoInstaller
     {
-        public RepositoriesBase RepositoriesBase;
-        public InteractorsBase InteractorsBase;
+        [SerializeField] private ProductionUIContainerMB productionUIContainerMB;
+
         public override void InstallBindings()
         {
-            RepositoriesBase = new RepositoriesBase();
-            InteractorsBase = new InteractorsBase();
-            
-            RepositoriesBase.CreateAllRepositories();
-            InteractorsBase.CreateAllInteractors();
-            
-            InstallRepositoriesBindings();
+            BindRepositoriesBaseAndInteractorsBase();
 
-            Container.Bind<RepositoriesBase>()
-                .FromInstance(RepositoriesBase)
+            BindOfflineIncomeManager();
+
+            BindShopOptionManager();
+
+            BindProductionUIFactory();
+
+            BindProductionFactory();
+            
+            BindProductionContainer();
+        }
+
+        private void BindProductionFactory()
+        {
+            Container.Bind<IProductionFactory>()
+                .To<ProductionFactory>()
+                .AsSingle();
+        }
+
+        private void BindProductionUIFactory()
+        {
+            Container
+                .BindInstance(productionUIContainerMB)
                 .AsSingle();
 
-            Container.Bind<InteractorsBase>()
-                .FromInstance(InteractorsBase)
+            Container
+                .Bind<IProductionUIFactory>()
+                .To<ProductionUIFactory>()
                 .AsSingle();
-            
+        }
+
+        private void BindProductionContainer()
+        {
+            Container
+                .BindInterfacesAndSelfTo<ProductionContainer>()
+                .AsSingle();
+        }
+
+        private void BindShopOptionManager()
+        {
+            Container.Bind<ShopOptionManager>()
+                .AsSingle();
+        }
+
+        private void BindOfflineIncomeManager()
+        {
             Container.Bind<OfflineIncomeManager>()
                 .AsSingle();
         }
 
-        private void InstallRepositoriesBindings()
+        private void BindRepositoriesBaseAndInteractorsBase()
         {
-            Container.Bind<IResourcesRepository>()
-                .To<ResourcesRepository>()
-                .FromInstance(RepositoriesBase.GetRepository<ResourcesRepository>())
-                .AsSingle()
-                .NonLazy();
+            RepositoriesBase repositoriesBase = new RepositoriesBase();
+            InteractorsBase interactorsBase = new InteractorsBase(repositoriesBase);
 
-            Container.Bind<IProductionsRepository>()
-                .To<ProductionsRepository>()
-                .FromInstance(RepositoriesBase.GetRepository<ProductionsRepository>())
-                .AsSingle().NonLazy();
+            repositoriesBase.CreateAllRepositories();
+            interactorsBase.CreateAllInteractors();
+
+            Container
+                .Bind<RepositoriesBase>()
+                .FromInstance(repositoriesBase)
+                .AsSingle();
+
+            Container
+                .Bind<InteractorsBase>()
+                .FromInstance(interactorsBase)
+                .AsSingle();
+
+            Container.Bind<ResourcesInteractor>()
+                .FromInstance(interactorsBase.GetInteractor<ResourcesInteractor>())
+                .AsSingle();
         }
     }
 }
