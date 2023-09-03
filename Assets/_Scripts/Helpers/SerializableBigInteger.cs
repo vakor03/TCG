@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace _Scripts.ScriptableObjects
+namespace _Scripts.Helpers
 {
     [Serializable]
     [StructLayout(LayoutKind.Explicit)]

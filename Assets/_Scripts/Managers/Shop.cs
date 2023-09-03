@@ -1,83 +1,83 @@
-﻿using System;
+﻿#region
+
 using System.Numerics;
-using _Scripts.Helpers;
+using _Scripts.Core.MarketItems;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
 using UnityEngine;
 
+#endregion
+
 namespace _Scripts.Managers
 {
-    public class Shop : StaticInstance<Shop>
+    public class Shop
     {
-        private ShopOption[] _availableOptions;
-        public event Action OnShopOptionChanged;
-        public ShopOption CurrentShopOption { get; private set; }
-        private int _currentShopOptionIndex;
+        private MarketItemDatabase _marketItemDatabase;
+        private ResourcesInteractor _resourcesInteractor;
+        private ShopOptionManager _shopOptionManager;
 
-        protected override void Awake()
+        private Shop(MarketItemDatabase marketItemDatabase, 
+            ResourcesInteractor resourcesInteractor, 
+            ShopOptionManager shopOptionManager)
         {
-            base.Awake();
-
-            _availableOptions = new[]
-            {
-                new ShopOption("x1", ShopOptionType.DefinedNumber, 1),
-                new ShopOption("10%", ShopOptionType.Percent, 10),
-                new ShopOption("50%", ShopOptionType.Percent, 50),
-                new ShopOption("MAX", ShopOptionType.Percent, 100),
-            };
-
-            _currentShopOptionIndex = 0;
-            CurrentShopOption = _availableOptions[_currentShopOptionIndex];
-        }
-
-        public void ChooseNextShopOption()
-        {
-            _currentShopOptionIndex = (_currentShopOptionIndex + 1) % _availableOptions.Length;
-            CurrentShopOption = _availableOptions[_currentShopOptionIndex];
-            OnShopOptionChanged?.Invoke();
+            _marketItemDatabase = marketItemDatabase;
+            _resourcesInteractor = resourcesInteractor;
+            _shopOptionManager = shopOptionManager;
         }
 
         public BigInteger CalculateCurrentBuyQuantity(ResourceSO resourceSO)
         {
-            if (CurrentShopOption.Type == ShopOptionType.DefinedNumber)
+            var currentShopOption = _shopOptionManager.CurrentShopOption;
+            if (currentShopOption.Type == ShopOptionType.DefinedNumber)
             {
-                if (FindMaxPossibleBuyCount(resourceSO) > CurrentShopOption.Value)
-                {
-                    return CurrentShopOption.Value;
-                }
-
-                return 0;
+                return CalculateBuyQuantityForDefinedNumber(resourceSO, currentShopOption);
             }
 
-            if (CurrentShopOption.Type == ShopOptionType.Percent)
+            if (currentShopOption.Type == ShopOptionType.Percent)
             {
-                var maxPossibleBuyCount = FindMaxPossibleBuyCount(resourceSO);
-                if (maxPossibleBuyCount == BigInteger.Zero)
-                {
-                    return BigInteger.Zero;
-                }
-                else
-                {
-                    return BigInteger.Max(BigInteger.One,
-                        maxPossibleBuyCount * CurrentShopOption.Value / 100);
-                }
+                return CalculateBuyQuantityForPercentType(resourceSO, currentShopOption);
             }
 
-            Debug.LogError($"{CurrentShopOption.Type} not supported!");
+            Debug.LogError($"{currentShopOption.Type} not supported!");
             return BigInteger.Zero;
         }
 
+        private BigInteger CalculateBuyQuantityForPercentType(ResourceSO resourceSO, ShopOption currentShopOption)
+        {
+            var maxPossibleBuyCount = FindMaxPossibleBuyCount(resourceSO);
+            if (maxPossibleBuyCount == BigInteger.Zero)
+            {
+                return BigInteger.Zero;
+            }
+            else
+            {
+                return BigInteger.Max(BigInteger.One,
+                    maxPossibleBuyCount * currentShopOption.Value / 100);
+            }
+        }
+
+        private BigInteger CalculateBuyQuantityForDefinedNumber(ResourceSO resourceSO, ShopOption currentShopOption)
+        {
+            if (FindMaxPossibleBuyCount(resourceSO) > currentShopOption.Value)
+            {
+                return currentShopOption.Value;
+            }
+
+            return 0;
+        }
+
+
         public BigInteger FindMaxPossibleBuyCount(ResourceSO resourceSO)
         {
-            if (RepositoriesHelper.GetRepository<MarketRepository>().TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 BigInteger max;
                 bool firstValue = true;
                 foreach (var (reqResourceSO, reqCount) in marketItemSO.PricePerUnit)
                 {
-                    var currentMax = GameManager.Instance.InteractorsBase.GetInteractor<ResourcesInteractor>().GetResourceQuantity(reqResourceSO) / reqCount;
+                    var currentMax = _resourcesInteractor.GetResourceQuantity(reqResourceSO) / reqCount;
                     if (firstValue)
                     {
                         max = currentMax;
@@ -94,15 +94,13 @@ namespace _Scripts.Managers
 
                 return max;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
 
         public bool TryBuyResource(ResourceSO resourceSO, BigInteger quantity)
         {
-            if (RepositoriesHelper.GetRepository<MarketRepository>().TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
             {
                 if (!CheckEnoughResourcesToBuy(marketItemSO, quantity))
                 {
@@ -119,29 +117,23 @@ namespace _Scripts.Managers
             }
         }
 
-
         private void ExchangeResources(MarketItem marketItem, BigInteger quantity)
         {
             foreach (var (item, reqQuantityPerUnit) in marketItem.PricePerUnit)
             {
                 BigInteger reqQuantityBigInteger = reqQuantityPerUnit * quantity;
 
-                GameManager.Instance.InteractorsBase
-                    .GetInteractor<ResourcesInteractor>()
-                    .SpendResource(item, reqQuantityBigInteger);
+                _resourcesInteractor.SpendResource(item, reqQuantityBigInteger);
             }
 
-            GameManager.Instance.InteractorsBase
-                .GetInteractor<ResourcesInteractor>()
-                .AddResource(marketItem.OutputResource, quantity);
+            _resourcesInteractor.AddResource(marketItem.OutputResource, quantity);
         }
 
         public bool CheckEnoughResourcesToBuy(MarketItem marketItemSO, BigInteger quantity)
         {
             foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
             {
-                if (!GameManager.Instance.InteractorsBase
-                        .GetInteractor<ResourcesInteractor>().IsEnoughResource(item, reqQuantity * quantity))
+                if (!_resourcesInteractor.IsEnoughResource(item, reqQuantity * quantity))
                 {
                     return false;
                 }

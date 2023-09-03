@@ -1,9 +1,15 @@
-﻿using System;
+﻿#region
+
+using System;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
+using _Scripts.Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
+
+#endregion
 
 namespace _Scripts.UI
 {
@@ -12,27 +18,40 @@ namespace _Scripts.UI
         [SerializeField] private TextMeshProUGUI text;
         [SerializeField] private Button closeButton;
 
+        private ResourcesInteractor _resourcesInteractor;
+        private InteractorsBase _interactorsBase;
+
+        [Inject]
+        public void Construct(InteractorsBase interactorsBase)
+        {
+            _interactorsBase = interactorsBase;
+        }
 
         protected override void Awake()
         {
             base.Awake();
-            
+
             closeButton.onClick.AddListener(Hide);
             Hide();
         }
 
-        public void Setup(TimeSpan timeElapsed,float totalSeconds, OfflineIncomeManager offlineIncomeManager)
+        private void Start()
+        {
+            _resourcesInteractor = _interactorsBase.GetInteractor<ResourcesInteractor>();
+        }
+
+        public void Setup(TimeSpan timeElapsed, float totalSeconds, OfflineIncomeManager offlineIncomeManager)
         {
             text.text = FormatTimeSpan(timeElapsed) + "\n" + totalSeconds + " seconds";
             closeButton.onClick.AddListener(() =>
             {
                 var income = offlineIncomeManager.CalculateOfflineIncome(totalSeconds);
-                foreach (var(resourceSO, quantity) in income)
+                foreach (var (resourceSO, quantity) in income)
                 {
                     Debug.Log($"You got {quantity.ToScientificNotationString()} {resourceSO.name} for offline income");
                 }
-                
-                InteractorsHelper.GetInteractor<ResourcesInteractor>().AddResources(income);
+
+                _resourcesInteractor.AddResources(income);
                 Hide();
             });
         }
@@ -46,7 +65,7 @@ namespace _Scripts.UI
         {
             gameObject.SetActive(false);
         }
-        
+
         private string FormatTimeSpan(TimeSpan timeSpan)
         {
             string formattedTime = $"{timeSpan.Minutes} min {timeSpan.Seconds} sec";

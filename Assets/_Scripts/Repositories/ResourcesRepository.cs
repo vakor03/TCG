@@ -10,6 +10,12 @@ using UnityEngine;
 
 namespace _Scripts.Repositories
 {
+    public interface IResourcesRepository : IRepository
+    {
+        Dictionary<ResourceSO, BigInteger> ResourcesQuantityMap { get; }
+        BigInteger GetResourceQuantity(ResourceSO resource);
+    }
+
     public class ResourcesRepository : IRepository
     {
         private const string PLAYER_PREFS_RESOURCES_PREFIX = "RES_KEY_";
