@@ -11,102 +11,33 @@ using MEC;
 
 namespace _Scripts.Core.Productions
 {
-    public class Production : IDisposable
+    public class Production
     {
-        private ResourceSO _connectedResource;
-        private CoroutineHandle _currentProductionCoroutine;
+        private ResourceSO _connectedResourceSO;
         private State _currentState;
-        private ResourceSO _productedResource;
-
-        private BigInteger _productionCount;
-
-        private ProductionStats _productionStats;
+        private IProducer _producer;
+        private ResourceSO _productionResourceSO;
         public ResourcesInteractor _resourcesInteractor;
 
-        
-        public Production(ProductionStats productionStats, 
-            ResourceSO productedResource, 
-            ResourceSO connectedResource,
+        public Production(IProducer producer,
+            ResourceSO productionResourceSO,
+            ResourceSO connectedResourceSO,
             ResourcesInteractor resourcesInteractor)
         {
-            _currentState = State.Stopped;
-            _productionStats = productionStats;
-            _productedResource = productedResource;
-            _connectedResource = connectedResource;
-
-            _productionStats.OnAutoProductionChanged += ProductionStatsOnAutoProductionChanged;
-            _productionStats.OnProductionRateChanged += () => OnProductionRateChanged?.Invoke();
-            _productionStats.OnProductionCountChanged += UpdateProductionCount;
-            
+            _producer = producer;
+            _productionResourceSO = productionResourceSO;
+            _connectedResourceSO = connectedResourceSO;
             _resourcesInteractor = resourcesInteractor;
-            
-            OnStart();
         }
 
-        public BigInteger ProductionCount
-        {
-            get => _productionCount;
-            private set
-            {
-                _productionCount = value;
-                OnProductionCountChanged?.Invoke();
-            }
-        }
+        private bool IsRunning => _currentState == State.Running;
 
-        public float ProductionRate => _productionStats.ProductionRate;
-
-        public void Dispose()
-        {
-            _resourcesInteractor.OnResourceQuantityChanged -= ResourcesRepositoryOnResourceQuantityChanged;
-        }
-
-        private void ProductionStatsOnAutoProductionChanged(bool value)
-        {
-            if (value)
-            {
-                if (_currentState == State.Stopped)
-                {
-                    StartOneTimeProductionCoroutine();
-                }
-
-                Timing.RunCoroutine(AutoProductionCoroutine());
-            }
-        }
-
-        public event Action OnProductionFinished;
-
-        public event Action OnProductionStarted;
-
-        public event Action OnProductionCountChanged;
-
-        public event Action OnProductionRateChanged;
-
-        public void OnStart()
-        {
-            _resourcesInteractor
-                .OnResourceQuantityChanged += ResourcesRepositoryOnResourceQuantityChanged;
-
-            UpdateProductionCount();
-        }
-
-
-        private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
-        {
-            if (changedResource == _connectedResource)
-            {
-                UpdateProductionCount();
-            }
-        }
-
-        private void UpdateProductionCount()
-        {
-            ProductionCount = _resourcesInteractor.GetResourceQuantity(_connectedResource) *
-                              _productionStats.ProductionCount;
-        }
+        public event Action OnStarted;
+        public event Action OnFinished;
 
         public void StartProduction()
         {
-            if (_currentState == State.Production)
+            if (IsRunning)
             {
                 return;
             }
@@ -116,36 +47,32 @@ namespace _Scripts.Core.Productions
 
         private void StartOneTimeProductionCoroutine()
         {
-            _currentProductionCoroutine = Timing.RunCoroutine(OneTimeProductionCoroutine());
+            Timing.RunCoroutine(OneTimeProductionCoroutine());
         }
 
         private IEnumerator<float> OneTimeProductionCoroutine()
         {
-            _currentState = State.Production;
-            OnProductionStarted?.Invoke();
+            _currentState = State.Running;
+            OnStarted?.Invoke();
 
-            yield return Timing.WaitForSeconds(_productionStats.ProductionRate);
+            yield return Timing.WaitForSeconds(_producer.CurrentStats.ProductionRate);
 
-            _resourcesInteractor.AddResource(_productedResource, ProductionCount);
+            _resourcesInteractor.AddResource(_productionResourceSO, GetProductionCount());
 
-            OnProductionFinished?.Invoke();
+            OnFinished?.Invoke();
             _currentState = State.Stopped;
         }
 
-        private IEnumerator<float> AutoProductionCoroutine()
+        private BigInteger GetProductionCount()
         {
-            while (_productionStats.AutoProduction)
-            {
-                yield return Timing.WaitUntilDone(_currentProductionCoroutine);
-                StartOneTimeProductionCoroutine();
-            }
+            return _producer.CurrentStats.ProductionCount
+                   * _resourcesInteractor.GetResourceQuantity(_connectedResourceSO);
         }
 
         private enum State
         {
             Stopped,
-            Production,
-            AutoProduction
+            Running,
         }
     }
 }

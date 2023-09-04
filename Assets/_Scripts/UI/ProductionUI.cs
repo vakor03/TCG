@@ -1,10 +1,13 @@
 ﻿#region
 
+using System;
+using System.Numerics;
 using _Scripts.Core.Productions;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
+using Codice.Client.Commands.WkTree;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +17,7 @@ using Zenject;
 
 namespace _Scripts.UI
 {
-    public class ProductionUI : MonoBehaviour
+    public class ProductionUI : MonoBehaviour, IDisposable
     {
         [SerializeField] private Image image;
         [SerializeField] private TextMeshProUGUI productionRate;
@@ -24,12 +27,12 @@ namespace _Scripts.UI
         [SerializeField] private ProgressBarUI progressBarUI;
         [SerializeField] private BuyResourceButtonUI buyResourceButtonUI;
 
-        private Production _production;
+        private Producer _producer;
         private ProductionSO _productionSO;
 
-        private ProductionDatabase _productionDatabase;
         private ResourcesInteractor _resourcesInteractor;
-        
+        private ProductionDatabase _productionDatabase;
+
         [Inject]
         public void Construct(ResourcesInteractor resourcesInteractor,
             ProductionDatabase productionDatabase)
@@ -41,23 +44,37 @@ namespace _Scripts.UI
         public void Init(ProductionSO productionSO)
         {
             _productionSO = productionSO;
+            _producer = _productionDatabase.GetProduction(_productionSO);
         }
 
         private void Start()
         {
-           
             buyResourceButtonUI.Init(_productionSO.ConnectedResource);
-            _production = _productionDatabase.GetProduction(_productionSO);
 
-            _production.OnProductionStarted += ProducerOnProductionStarted;
-            _production.OnProductionCountChanged += ProductionOnProductionCountChanged;
-            _production.OnProductionRateChanged += ProductionOnProductionRateChanged;
+            _resourcesInteractor.OnResourceQuantityChanged += ResourcesInteractorOnResourceQuantityChanged;
+            _producer.OnProductionStarted += ProducerOnProducerStarted;
+            _producer.OnStatsChanged += ProducerOnStatsChanged;
+            
             _resourcesInteractor.OnResourceQuantityChanged +=
                 ResourcesRepositoryOnResourceQuantityChanged;
 
             progressBarUI.Button.onClick.AddListener(StartProduction);
 
             SetDefaultValues();
+        }
+
+        private void ResourcesInteractorOnResourceQuantityChanged(ResourceSO changedResource)
+        {
+            if (changedResource == _productionSO.ConnectedResource)
+            {
+                SetProductionCountText();
+            }
+        }
+
+        private void ProducerOnStatsChanged()
+        {
+            SetProductionCountText();
+            SetProductionRateText();
         }
 
         private void ResourcesRepositoryOnResourceQuantityChanged(ResourceSO changedResource)
@@ -68,20 +85,20 @@ namespace _Scripts.UI
             }
         }
 
-
-        private void ProductionOnProductionCountChanged()
-        {
-            SetProductionCountText();
-        }
-
         private void SetProductionCountText()
         {
-            productionCount.text = _production.ProductionCount.ToScientificNotationString();
+            productionCount.text = GetProductionCount().ToScientificNotationString();
         }
 
-        private void ProductionOnProductionRateChanged()
+        private BigInteger GetProductionCount()
         {
-            productionRate.text = _production.ProductionRate.ToString();
+            return _producer.CurrentStats.ProductionCount *
+                   _resourcesInteractor.GetResourceQuantity(_productionSO.ConnectedResource);
+        }
+
+        private void SetProductionRateText()
+        {
+            productionRate.text = _producer.CurrentStats.ProductionRate.ToString();
         }
 
         private void SetResourceCountText()
@@ -93,21 +110,25 @@ namespace _Scripts.UI
         private void SetDefaultValues()
         {
             image.sprite = _productionSO.Sprite;
-            productionRate.text = _production.ProductionRate.ToString();
+            SetProductionRateText();
             SetProductionCountText();
 
             SetResourceCountText();
         }
 
-        private void ProducerOnProductionStarted()
+        private void ProducerOnProducerStarted()
         {
-            progressBarUI.FillAndReset(_productionDatabase
-                .GetProduction(_productionSO).ProductionRate);
+            progressBarUI.FillAndReset(_producer.CurrentStats.ProductionRate);
         }
 
         private void StartProduction()
         {
-            _production.StartProduction();
+            _producer.StartProduction();
+        }
+
+        public void Dispose()
+        {
+            _resourcesInteractor.OnResourceQuantityChanged -= ResourcesInteractorOnResourceQuantityChanged;
         }
     }
 }

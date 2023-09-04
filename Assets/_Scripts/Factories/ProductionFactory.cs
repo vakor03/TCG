@@ -1,6 +1,5 @@
 ﻿using _Scripts.Core.Productions;
 using _Scripts.Interactors;
-using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
 
 namespace _Scripts.Factories
@@ -14,11 +13,11 @@ namespace _Scripts.Factories
             _resourcesInteractor = resourcesInteractor;
         }
 
-        public Production Create(ProductionStats productionStats,
+        public Producer Create(ProductionStats productionStats,
             ResourceSO productedResource,
             ResourceSO connectedResource)
         {
-            return new Production(productionStats,
+            return new Producer(productionStats,
                 productedResource,
                 connectedResource,
                 _resourcesInteractor);

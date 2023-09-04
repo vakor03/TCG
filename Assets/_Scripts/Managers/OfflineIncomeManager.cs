@@ -8,7 +8,6 @@ using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
-using Zenject;
 
 #endregion
 
@@ -16,9 +15,9 @@ namespace _Scripts.Managers
 {
     public class OfflineIncomeManager
     {
-        private LastTimeOnlineInteractor _lastTimeOnlineInteractor;
-        private ProductionDatabase _productionDatabase;
-        private ResourcesInteractor _resourcesInteractor;
+        private readonly LastTimeOnlineInteractor _lastTimeOnlineInteractor;
+        private readonly ProductionDatabase _productionDatabase;
+        private readonly ResourcesInteractor _resourcesInteractor;
 
         private OfflineIncomeManager(ResourcesInteractor resourcesInteractor,
             ProductionDatabase productionDatabase,
@@ -47,15 +46,14 @@ namespace _Scripts.Managers
 
                 var connectedResourceQuantity =
                     _resourcesInteractor.GetResourceQuantity(productionSO.ConnectedResource);
-                var productionSpeed = productionStats.GetProductionSpeed();
+                var productionSpeed = productionStats.ProductionRate;
                 var secondsSinceOnline = _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline().ToTotalSeconds();
                 
                 var totalSeconds = new BigInteger(secondsSinceOnline);
 
-                var producedQuantity = connectedResourceQuantity
-                                       * productionSpeed
-                                       * totalSeconds;
 
+                var producedQuantity = (connectedResourceQuantity
+                                        * totalSeconds).Divide(productionSpeed, 3);
                 income.Add(productionResource, producedQuantity);
             }
 
