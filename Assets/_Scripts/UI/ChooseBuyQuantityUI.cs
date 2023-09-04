@@ -1,4 +1,5 @@
 ﻿using _Scripts.Managers;
+using _Scripts.Managers.Shops;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

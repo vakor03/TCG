@@ -1,6 +1,7 @@
 ﻿using System;
+using _Scripts.Repositories;
 
-namespace _Scripts.Managers
+namespace _Scripts.Interactors
 {
     public class LastTimeOnlineInteractor
     {

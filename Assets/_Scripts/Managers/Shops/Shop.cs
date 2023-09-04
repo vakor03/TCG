@@ -5,12 +5,11 @@ using _Scripts.Core.MarketItems;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
-using _Scripts.UI;
 using UnityEngine;
 
 #endregion
 
-namespace _Scripts.Managers
+namespace _Scripts.Managers.Shops
 {
     public class Shop
     {

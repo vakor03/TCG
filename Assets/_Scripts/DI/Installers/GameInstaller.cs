@@ -2,6 +2,7 @@
 using _Scripts.Factories;
 using _Scripts.Interactors;
 using _Scripts.Managers;
+using _Scripts.Managers.Shops;
 using _Scripts.Repositories;
 using _Scripts.UI;
 using UnityEngine;

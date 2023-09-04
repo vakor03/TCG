@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
-using _Scripts.Repositories;
 using UnityEngine;
-using Zenject;
 
-namespace _Scripts.Managers
+namespace _Scripts.Repositories
 {
     public class LastTimeOnlineRepository : IRepository
     {

@@ -1,6 +1,7 @@
 ﻿#region
 
 using _Scripts.Factories;
+using _Scripts.Interactors;
 using _Scripts.ScriptableObjects;
 using _Scripts.UI;
 using UnityEngine;

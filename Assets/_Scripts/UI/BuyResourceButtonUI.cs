@@ -4,6 +4,7 @@ using System.Numerics;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Managers;
+using _Scripts.Managers.Shops;
 using _Scripts.ScriptableObjects;
 using TMPro;
 using UnityEngine;
