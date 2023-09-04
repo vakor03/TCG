@@ -1,4 +1,4 @@
-﻿namespace _Scripts.Core.Productions
+﻿namespace _Scripts.Core.Productions.Upgrades
 {
     public interface IUpgrade
     {
