@@ -36,5 +36,10 @@ namespace _Scripts.Helpers
 
             return SB.ToString();
         }
+
+        public static float ToTotalSeconds(this TimeSpan timeSpan)
+        {
+            return (float)timeSpan.TotalSeconds;
+        }
     }
 }

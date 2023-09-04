@@ -3,6 +3,7 @@ using _Scripts.Factories;
 using _Scripts.Interactors;
 using _Scripts.Managers;
 using _Scripts.Repositories;
+using _Scripts.UI;
 using UnityEngine;
 using Zenject;
 
@@ -11,26 +12,72 @@ namespace _Scripts.DI.Installers
     public class GameInstaller : MonoInstaller
     {
         [SerializeField] private ProductionUIContainerMB productionUIContainerMB;
-
+        [SerializeField] private OfflineIncomeUI offlineIncomeUI;
         public override void InstallBindings()
         {
             BindResourcesRepository();
-
             BindResourcesInteractor();
 
-            BindOfflineIncomeManager();
+            BindLastTimeOnlineRepository();
+            BindLastTimeOnlineInteractor();
+            
+            BindManagers();
 
-            BindShopOptionManager();
+            BindFactories();
 
+            BindDatabases();
+
+            BindShop();
+
+            BindOfflineIncomeUI();
+        }
+
+        private void BindDatabases()
+        {
+            BindProductionDatabase();
+            BindMarketItemDatabase();
+        }
+
+        private void BindFactories()
+        {
             BindProductionUIFactory();
 
             BindProductionFactory();
+        }
 
-            BindProductionContainer();
+        private void BindManagers()
+        {
+            BindShopOptionManager();
 
-            BindShop();
+            BindOfflineIncomeManager();
             
-            BindMarketItemDatabase();
+            BindSaveCoordinator();
+        }
+
+        private void BindLastTimeOnlineInteractor()
+        {
+            Container
+                .Bind<LastTimeOnlineInteractor>()
+                .AsSingle();
+        }
+
+        private void BindLastTimeOnlineRepository()
+        {
+            Container
+                .BindInterfacesAndSelfTo<LastTimeOnlineRepository>()
+                .AsSingle();
+        }
+
+        private void BindSaveCoordinator()
+        {
+            Container
+                .Bind<SaveCoordinator>()
+                .AsSingle();
+        }
+
+        private void BindOfflineIncomeUI()
+        {
+            Container.BindInstance(offlineIncomeUI).AsSingle();
         }
 
         private void BindResourcesInteractor()
@@ -78,7 +125,7 @@ namespace _Scripts.DI.Installers
                 .AsSingle();
         }
 
-        private void BindProductionContainer()
+        private void BindProductionDatabase()
         {
             Container
                 .BindInterfacesAndSelfTo<ProductionDatabase>()
@@ -93,7 +140,7 @@ namespace _Scripts.DI.Installers
 
         private void BindOfflineIncomeManager()
         {
-            Container.Bind<OfflineIncomeManager>()
+            Container.BindInterfacesAndSelfTo<OfflineIncomeManager>()
                 .AsSingle();
         }
     }

@@ -5,13 +5,12 @@ using System.Linq;
 using System.Numerics;
 using _Scripts.ScriptableObjects;
 using UnityEngine;
-using Zenject;
 
 #endregion
 
 namespace _Scripts.Repositories
 {
-    public class ResourcesRepository : IInitializable
+    public class ResourcesRepository : IRepository
     {
         private const string PLAYER_PREFS_RESOURCES_PREFIX = "RES_KEY_";
         private const string RESOURCES_PATH = "ScriptableObjects/Resources";

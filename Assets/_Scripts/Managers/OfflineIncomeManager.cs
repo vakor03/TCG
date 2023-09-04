@@ -2,12 +2,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using _Scripts.Helpers;
+using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
-using UnityEngine;
+using Zenject;
 
 #endregion
 
@@ -15,45 +16,27 @@ namespace _Scripts.Managers
 {
     public class OfflineIncomeManager
     {
-        private const string LAST_TIME_ONLINE_KEY = "LAST_TIME_OFFLINE_KEY";
-        private const float MAX_SECONDS_OFFLINE_COUNT = float.MaxValue;
-        private readonly CultureInfo _dateTimeCulture = CultureInfo.InvariantCulture;
-        private readonly string _dateTimeFormat = "u";
+        private LastTimeOnlineInteractor _lastTimeOnlineInteractor;
         private ProductionDatabase _productionDatabase;
+        private ResourcesInteractor _resourcesInteractor;
 
-        private ResourcesRepository _resourcesRepository;
-
-        private OfflineIncomeManager(ResourcesRepository resourcesRepository,
-            ProductionDatabase productionDatabase)
+        private OfflineIncomeManager(ResourcesInteractor resourcesInteractor,
+            ProductionDatabase productionDatabase,
+            LastTimeOnlineInteractor lastTimeOnlineInteractor)
         {
-            _resourcesRepository = resourcesRepository;
+            _resourcesInteractor = resourcesInteractor;
             _productionDatabase = productionDatabase;
+            _lastTimeOnlineInteractor = lastTimeOnlineInteractor;
         }
 
-        public event Action OnFirstGameEnter;
+        public Dictionary<ResourceSO, BigInteger> OfflineIncome { get; private set; }
 
-        public bool TryGetTimeFromLastTimeOnline(out float seconds, out TimeSpan difference)
+        public void Setup()
         {
-            if (PlayerPrefs.HasKey(LAST_TIME_ONLINE_KEY))
-            {
-                var timeNow = DateTime.UtcNow;
-                var lastSaveTime = PlayerPrefs.GetString(LAST_TIME_ONLINE_KEY);
-                var lastSaveDateTime = DateTime.ParseExact(lastSaveTime, _dateTimeFormat, _dateTimeCulture);
-                difference = timeNow - lastSaveDateTime;
-                seconds = Mathf.Clamp((float)(difference).TotalSeconds, 0f, MAX_SECONDS_OFFLINE_COUNT);
-                return true;
-            }
-            else
-            {
-                seconds = 0;
-                difference = new TimeSpan();
-                OnFirstGameEnter?.Invoke();
-                return false;
-            }
+            OfflineIncome = CalculateOfflineIncome();
         }
 
-
-        public Dictionary<ResourceSO, BigInteger> CalculateOfflineIncome(float seconds)
+        private Dictionary<ResourceSO, BigInteger> CalculateOfflineIncome()
         {
             var income = new Dictionary<ResourceSO, BigInteger>();
 
@@ -63,10 +46,11 @@ namespace _Scripts.Managers
                 var productionResource = productionSO.ProductionResource;
 
                 var connectedResourceQuantity =
-                    _resourcesRepository.GetResourceQuantity(productionSO.ConnectedResource);
+                    _resourcesInteractor.GetResourceQuantity(productionSO.ConnectedResource);
                 var productionSpeed = productionStats.GetProductionSpeed();
-                var totalSeconds = new BigInteger(seconds);
-
+                var secondsSinceOnline = _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline().ToTotalSeconds();
+                
+                var totalSeconds = new BigInteger(secondsSinceOnline);
 
                 var producedQuantity = connectedResourceQuantity
                                        * productionSpeed
@@ -76,6 +60,11 @@ namespace _Scripts.Managers
             }
 
             return income;
+        }
+
+        public void ReceiveIncome()
+        {
+            _resourcesInteractor.AddResources(OfflineIncome);
         }
 
         public List<ProductionSO> GetFinalProductions()
@@ -93,12 +82,9 @@ namespace _Scripts.Managers
             return finalProductions;
         }
 
-        public void Save()
+        public TimeSpan GetTimeSinceLastOnline()
         {
-            var timeNow = DateTime.UtcNow;
-            string timeString = timeNow.ToString(_dateTimeFormat, _dateTimeCulture);
-            PlayerPrefs.SetString(LAST_TIME_ONLINE_KEY, timeString);
-            PlayerPrefs.Save();
+           return _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline();
         }
     }
 }

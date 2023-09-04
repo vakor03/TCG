@@ -188,6 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   productionUIContainerMB: {fileID: 1654724464}
+  offlineIncomeUI: {fileID: 851392459}
 --- !u!114 &284451832
 MonoBehaviour:
   m_ObjectHideFlags: 0
