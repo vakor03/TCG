@@ -69,21 +69,6 @@ namespace _Scripts.Managers
             _resourcesInteractor.AddResources(OfflineIncome);
         }
 
-        // public List<ProductionSO> GetFinalProductions()
-        // {
-        //     var finalProductions = new List<ProductionSO>();
-        //     foreach (var productionSO in _productionDatabase.ProductionSOs)
-        //     {
-        //         if (_productionDatabase.ProductionSOs.All(so =>
-        //                 so.ProductionResource != productionSO.ConnectedResource))
-        //         {
-        //             finalProductions.Add(productionSO);
-        //         }
-        //     }
-        //
-        //     return finalProductions;
-        // }
-
         public TimeSpan GetTimeSinceLastOnline()
         {
            return _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline();
