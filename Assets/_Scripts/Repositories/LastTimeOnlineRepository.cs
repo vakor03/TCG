@@ -19,15 +19,25 @@ namespace _Scripts.Repositories
             TimeGameStarted = DateTime.UtcNow;
             if (PlayerPrefs.HasKey(LAST_TIME_ONLINE_KEY))
             {
-                var lastTimeOnlineString = PlayerPrefs.GetString(LAST_TIME_ONLINE_KEY);
-                LastTimeOnline = DateTime.ParseExact(lastTimeOnlineString, _dateTimeFormat, _dateTimeCulture);
-                IsFirstGameEnter = false;
+                InitializeLastTimeOnline();
             }
             else
             {
-                IsFirstGameEnter = true;
-                LastTimeOnline = DateTime.UtcNow;
+                InitializeFirstGameEnter();
             }
+        }
+
+        private void InitializeLastTimeOnline()
+        {
+            var lastTimeOnlineString = PlayerPrefs.GetString(LAST_TIME_ONLINE_KEY);
+            LastTimeOnline = DateTime.ParseExact(lastTimeOnlineString, _dateTimeFormat, _dateTimeCulture);
+            IsFirstGameEnter = false;
+        }
+
+        private void InitializeFirstGameEnter()
+        {
+            IsFirstGameEnter = true;
+            LastTimeOnline = DateTime.UtcNow;
         }
 
         public void Save()

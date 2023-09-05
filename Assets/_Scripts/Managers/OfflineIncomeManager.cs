@@ -41,23 +41,27 @@ namespace _Scripts.Managers
 
             foreach (var productionSO in _productionDatabase.ProductionSOs)
             {
-                var productionStats = _productionDatabase.GetProductionStats(productionSO);
-                var productionResource = productionSO.ProductionResource;
-
-                var connectedResourceQuantity =
-                    _resourcesInteractor.GetResourceQuantity(productionSO.ConnectedResource);
-                var productionSpeed = productionStats.ProductionRate;
-                var secondsSinceOnline = _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline().ToTotalSeconds();
-                
-                var totalSeconds = new BigInteger(secondsSinceOnline);
-
-
-                var producedQuantity = (connectedResourceQuantity
-                                        * totalSeconds).Divide(productionSpeed, 3);
-                income.Add(productionResource, producedQuantity);
+                income.Add(productionSO.ProductionResource, CalculateProducedQuantity(productionSO));
             }
 
             return income;
+        }
+
+        private BigInteger CalculateProducedQuantity(ProductionSO productionSO)
+        {
+            var productionStats = _productionDatabase.GetProductionStats(productionSO);
+
+            var connectedResourceQuantity =
+                _resourcesInteractor.GetResourceQuantity(productionSO.ConnectedResource);
+            var productionSpeed = productionStats.ProductionRate;
+            var secondsSinceOnline = _lastTimeOnlineInteractor.GetTimeFromSinceTimeOnline().ToTotalSeconds();
+
+            var totalSeconds = new BigInteger(secondsSinceOnline);
+
+
+            var producedQuantity = (connectedResourceQuantity
+                                    * totalSeconds).Divide(productionSpeed, 3);
+            return producedQuantity;
         }
 
         public void ReceiveIncome()
@@ -65,20 +69,20 @@ namespace _Scripts.Managers
             _resourcesInteractor.AddResources(OfflineIncome);
         }
 
-        public List<ProductionSO> GetFinalProductions()
-        {
-            var finalProductions = new List<ProductionSO>();
-            foreach (var productionSO in _productionDatabase.ProductionSOs)
-            {
-                if (_productionDatabase.ProductionSOs.All(so =>
-                        so.ProductionResource != productionSO.ConnectedResource))
-                {
-                    finalProductions.Add(productionSO);
-                }
-            }
-
-            return finalProductions;
-        }
+        // public List<ProductionSO> GetFinalProductions()
+        // {
+        //     var finalProductions = new List<ProductionSO>();
+        //     foreach (var productionSO in _productionDatabase.ProductionSOs)
+        //     {
+        //         if (_productionDatabase.ProductionSOs.All(so =>
+        //                 so.ProductionResource != productionSO.ConnectedResource))
+        //         {
+        //             finalProductions.Add(productionSO);
+        //         }
+        //     }
+        //
+        //     return finalProductions;
+        // }
 
         public TimeSpan GetTimeSinceLastOnline()
         {

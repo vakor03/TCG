@@ -17,24 +17,51 @@ namespace _Scripts.Helpers
             string numberString = number.ToString();
             Span<char> span = numberString.ToCharArray();
             int digits = numberString.Length;
-
             int digitsAtStart = digits % maxDigitsAtStart == 0 ? maxDigitsAtStart : digits % maxDigitsAtStart;
 
-            SB.Append(span.Slice(0, digitsAtStart));
-            
-            int eCount = digits - digitsAtStart;
-            Debug.Assert(eCount >= 0);
+            Span<char> mantissa = span.Slice(0, digitsAtStart);
+            AppendMantissa(mantissa);
 
-            if (eCount > 0)
+            int exponent = digits - digitsAtStart;
+            Debug.Assert(exponent >= 0);
+
+            if (RequireExponent())
             {
-                SB.Append('.');
-                SB.Append(span.Slice(digitsAtStart, digitsAfterComa));
-                
-                SB.Append('E');
-                SB.Append(eCount);
+                Span<char> decimalFraction = GetDecimalFraction(digitsAfterComa, span, digitsAtStart);
+                AppendDecimalFraction(decimalFraction);
+
+                AppendExponent(exponent);
             }
 
             return SB.ToString();
+
+            bool RequireExponent()
+            {
+                return exponent > 0;
+            }
+        }
+
+        private static void AppendMantissa(Span<char> mantissa)
+        {
+            SB.Append(mantissa);
+        }
+
+        private static void AppendExponent(int exponent)
+        {
+            SB.Append('E');
+            SB.Append(exponent);
+        }
+
+        private static void AppendDecimalFraction(Span<char> decimalFraction)
+        {
+            SB.Append('.');
+
+            SB.Append(decimalFraction);
+        }
+
+        private static Span<char> GetDecimalFraction(int digitsAfterComa, Span<char> span, int digitsAtStart)
+        {
+            return span.Slice(digitsAtStart, digitsAfterComa);
         }
 
         public static float ToTotalSeconds(this TimeSpan timeSpan)

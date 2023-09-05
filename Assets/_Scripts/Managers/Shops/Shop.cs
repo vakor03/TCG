@@ -1,7 +1,9 @@
 ﻿#region
 
+using System.Linq;
 using System.Numerics;
 using _Scripts.Core.MarketItems;
+using _Scripts.Helpers;
 using _Scripts.Interactors;
 using _Scripts.Repositories;
 using _Scripts.ScriptableObjects;
@@ -17,8 +19,8 @@ namespace _Scripts.Managers.Shops
         private ResourcesInteractor _resourcesInteractor;
         private ShopOptionManager _shopOptionManager;
 
-        private Shop(MarketItemDatabase marketItemDatabase, 
-            ResourcesInteractor resourcesInteractor, 
+        private Shop(MarketItemDatabase marketItemDatabase,
+            ResourcesInteractor resourcesInteractor,
             ShopOptionManager shopOptionManager)
         {
             _marketItemDatabase = marketItemDatabase;
@@ -70,59 +72,48 @@ namespace _Scripts.Managers.Shops
 
         public BigInteger FindMaxPossibleBuyCount(ResourceSO resourceSO)
         {
-            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (!_marketItemDatabase.CheckIfMarketItemExists(resourceSO))
             {
-                BigInteger max;
-                bool firstValue = true;
-                foreach (var (reqResourceSO, reqCount) in marketItemSO.PricePerUnit)
-                {
-                    var currentMax = _resourcesInteractor.GetResourceQuantity(reqResourceSO) / reqCount;
-                    if (firstValue)
-                    {
-                        max = currentMax;
-                        firstValue = false;
-                    }
-                    else
-                    {
-                        if (currentMax < max)
-                        {
-                            max = currentMax;
-                        }
-                    }
-                }
-
-                return max;
+                return BigInteger.Zero;
             }
 
-            return 0;
+            MarketItem marketItemSO = _marketItemDatabase.GetMarketItem(resourceSO);
+            BigInteger max = marketItemSO.PricePerUnit.Max(pair =>  _resourcesInteractor.GetResourceQuantity(pair.Key) / pair.Value);
+            
+            return max;
         }
 
-        public bool TryBuyResource(ResourceSO resourceSO, BigInteger quantity)
+        public bool CanBuyResource(ResourceSO resourceSO, BigInteger quantity)
         {
-            if (_marketItemDatabase.TryGetMarketItem(resourceSO, out var marketItemSO))
+            if (!_marketItemDatabase.CheckIfMarketItemExists(resourceSO))
             {
-                if (!CheckEnoughResourcesToBuy(marketItemSO, quantity))
-                {
-                    return false;
-                }
-
-                ExchangeResources(marketItemSO, quantity);
-                return true;
-            }
-            else
-            {
-                Debug.LogError($"No market item for {resourceSO.Name}");
                 return false;
             }
-        }
 
+            MarketItem marketItemSO = _marketItemDatabase.GetMarketItem(resourceSO);
+            return CheckEnoughResourcesToBuy(marketItemSO, quantity);
+        }
+        
+        public void BuyResource(ResourceSO resourceSO, BigInteger quantity)
+        {
+            MarketItem marketItem = _marketItemDatabase.GetMarketItem(resourceSO);
+            
+            ExchangeResources(marketItem, quantity);
+            LogBuy(resourceSO, quantity);
+        }
+        
+        private void LogBuy(ResourceSO resourceSO, BigInteger quantity)
+        {
+            Debug.Log($"Bought {quantity.ToScientificNotationString()} {resourceSO.Name}");
+        }
+      
         private void ExchangeResources(MarketItem marketItem, BigInteger quantity)
         {
             foreach (var (item, reqQuantityPerUnit) in marketItem.PricePerUnit)
             {
-                BigInteger reqQuantityBigInteger = reqQuantityPerUnit * quantity;
+                BigInteger totalRequiredQuantity = reqQuantityPerUnit * quantity;
 
-                _resourcesInteractor.SpendResource(item, reqQuantityBigInteger);
+                _resourcesInteractor.SpendResource(item, totalRequiredQuantity);
             }
 
             _resourcesInteractor.AddResource(marketItem.OutputResource, quantity);
@@ -130,15 +121,17 @@ namespace _Scripts.Managers.Shops
 
         public bool CheckEnoughResourcesToBuy(MarketItem marketItemSO, BigInteger quantity)
         {
-            foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
-            {
-                if (!_resourcesInteractor.IsEnoughResource(item, reqQuantity * quantity))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            // foreach (var (item, reqQuantity) in marketItemSO.PricePerUnit)
+            // {
+            //     if (!_resourcesInteractor.IsEnoughResource(item, reqQuantity * quantity))
+            //     {
+            //         return false;
+            //     }
+            // }
+            //
+            // return true;
+            
+            return marketItemSO.PricePerUnit.All(pair => _resourcesInteractor.IsEnoughResource(pair.Key, pair.Value * quantity));
         }
     }
 }

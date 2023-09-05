@@ -23,18 +23,38 @@ namespace _Scripts.Managers
 
         private void Start()
         {
-            if (_lastTimeOnlineInteractor.IsFirstTimePlaying())
+            if (IsFirstTimePlaying())
             {
-                _offlineIncomeUI.Hide();
-                Debug.Log("First time playing?");
+                StartAsFirstTimePlaying();
             }
             else
             {
-                _offlineIncomeManager.Setup();
-                _offlineIncomeUI.Show();
-                _offlineIncomeUI.UpdateText();
+                StartAsRegular();
             }
 
+            CreateNecessaryProductionsUI();
+
+            bool IsFirstTimePlaying()
+            {
+                return _lastTimeOnlineInteractor.IsFirstTimePlaying();
+            }
+        }
+
+        private void StartAsRegular()
+        {
+            _offlineIncomeManager.Setup();
+            _offlineIncomeUI.Show();
+            _offlineIncomeUI.UpdateText();
+        }
+
+        private void StartAsFirstTimePlaying()
+        {
+            _offlineIncomeUI.Hide();
+            Debug.Log("First time playing?");
+        }
+
+        private void CreateNecessaryProductionsUI()
+        {
             foreach (var productionSO in firstLevelConfigSO.ProductionsAvailable)
             {
                 _productionUIFactory.Create(productionSO);

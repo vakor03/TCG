@@ -67,7 +67,14 @@ namespace _Scripts.UI
 
         private void BuyProducer()
         {
-            _shop.TryBuyResource(_resourceSO, _currentBuyQuantity);
+            if (_shop.CanBuyResource(_resourceSO, _currentBuyQuantity))
+            {
+                _shop.BuyResource(_resourceSO, _currentBuyQuantity);
+            }
+            else
+            {
+                Debug.LogError("Not enough resources!");
+            }
         }
     }
 }

@@ -21,24 +21,24 @@ namespace _Scripts.Managers
         private void SwitchGameState(GameState gameState)
         {
             _gameState = gameState;
-            switch (gameState)
-            {
-                case GameState.Started:
-                    OnGameStarted?.Invoke();
-                    break;
-                case GameState.Paused:
-                    OnGamePaused?.Invoke();
-                    break;
-                case GameState.Finished:
-                    OnGameFinished?.Invoke();
-                    break;
-                case GameState.Initializing:
-                    OnGameInitializing?.Invoke();
-                    break;
-                case GameState.Initialized:
-                    OnGameInitialized?.Invoke();
-                    break;
-            }
+            // switch (gameState)
+            // {
+            //     case GameState.Started:
+            //         OnGameStarted?.Invoke();
+            //         break;
+            //     case GameState.Paused:
+            //         OnGamePaused?.Invoke();
+            //         break;
+            //     case GameState.Finished:
+            //         OnGameFinished?.Invoke();
+            //         break;
+            //     case GameState.Initializing:
+            //         OnGameInitializing?.Invoke();
+            //         break;
+            //     case GameState.Initialized:
+            //         OnGameInitialized?.Invoke();
+            //         break;
+            // }
         }
 
         public void StartGame()

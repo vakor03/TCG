@@ -25,7 +25,12 @@ namespace _Scripts.Repositories
             return _marketItemsMap[resourceSO];
         }
 
-        public bool TryGetMarketItem(ResourceSO resourceSO, out MarketItem marketItem)
+        public bool CheckIfMarketItemExists(ResourceSO resourceSO)
+        {
+            return _marketItemsMap.ContainsKey(resourceSO);
+        }
+
+        private bool TryGetMarketItem(ResourceSO resourceSO, out MarketItem marketItem)
         {
             return _marketItemsMap.TryGetValue(resourceSO, out marketItem);
         }
