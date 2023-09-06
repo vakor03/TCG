@@ -12,8 +12,8 @@ namespace _Scripts.Repositories
     {
         private const string PRODUCTIONS_PATH = "ScriptableObjects/Productions";
         private List<ProductionSO> _productionSOs;
+        public Dictionary<ProductionSO, Producer> ProducersMap => _productionsMap;
         private Dictionary<ProductionSO, Producer> _productionsMap;
-        private Dictionary<ProductionSO, ProductionStats> _productionStatsMap;
 
         private readonly IProductionFactory _productionFactory;
         public List<ProductionSO> ProductionSOs => _productionSOs;
@@ -26,25 +26,15 @@ namespace _Scripts.Repositories
         private void AssembleProductions()
         {
             _productionSOs = Resources.LoadAll<ProductionSO>(PRODUCTIONS_PATH).ToList();
-            _productionStatsMap = _productionSOs.ToDictionary(so => so, so => 
-                new ProductionStats(so.ProductionCount, so.BaseProductionRate));
             _productionsMap = _productionSOs.ToDictionary(so => so, so =>
             {
-                return _productionFactory.Create(
-                    _productionStatsMap[so],
-                    so.ProductionResource,
-                    so.ConnectedResource);
+                return _productionFactory.Create(so);
             });
         }
 
-        public Producer GetProduction(ProductionSO productionsO)
+        public Producer GetProducer(ProductionSO productionsO)
         {
             return _productionsMap[productionsO];
-        }
-
-        public ProductionStats GetProductionStats(ProductionSO productionSO)
-        {
-            return _productionStatsMap[productionSO];
         }
 
         public void Initialize()

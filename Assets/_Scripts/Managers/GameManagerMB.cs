@@ -17,7 +17,7 @@ namespace _Scripts.Managers
         private OfflineIncomeManager _offlineIncomeManager;
 
         private IProductionUIFactory _productionUIFactory;
-        private OfflineIncomeUI _offlineIncomeUI;
+        [SerializeField] private OfflineIncomeUI offlineIncomeUI;
         private SaveCoordinator _saveCoordinator;
         private LastTimeOnlineInteractor _lastTimeOnlineInteractor;
 
@@ -43,13 +43,13 @@ namespace _Scripts.Managers
         private void StartAsRegular()
         {
             _offlineIncomeManager.Setup();
-            _offlineIncomeUI.Show();
-            _offlineIncomeUI.UpdateText();
+            offlineIncomeUI.Show();
+            offlineIncomeUI.UpdateText();
         }
 
         private void StartAsFirstTimePlaying()
         {
-            _offlineIncomeUI.Hide();
+            offlineIncomeUI.Hide();
             Debug.Log("First time playing?");
         }
 
@@ -73,13 +73,11 @@ namespace _Scripts.Managers
         public void Construct(
             OfflineIncomeManager offlineIncomeManager,
             IProductionUIFactory productionUIFactory,
-            OfflineIncomeUI offlineIncomeUI,
             SaveCoordinator saveCoordinator,
             LastTimeOnlineInteractor lastTimeOnlineInteractor)
         {
             _offlineIncomeManager = offlineIncomeManager;
             _productionUIFactory = productionUIFactory;
-            _offlineIncomeUI = offlineIncomeUI;
             _saveCoordinator = saveCoordinator;
             _lastTimeOnlineInteractor = lastTimeOnlineInteractor;
         }

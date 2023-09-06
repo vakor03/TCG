@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using _Scripts.Helpers;
 using _Scripts.Interactors;
@@ -49,7 +48,7 @@ namespace _Scripts.Managers
 
         private BigInteger CalculateProducedQuantity(ProductionSO productionSO)
         {
-            var productionStats = _productionDatabase.GetProductionStats(productionSO);
+            var productionStats = _productionDatabase.GetProducer(productionSO).CurrentStats;
 
             var connectedResourceQuantity =
                 _resourcesInteractor.GetResourceQuantity(productionSO.ConnectedResource);

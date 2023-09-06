@@ -12,8 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7654124ce5304b909f9737c8a131fca2, type: 3}
   m_Name: Tier_03
   m_EditorClassIdentifier: 
-  <ConnectedResource>k__BackingField: {fileID: 11400000, guid: 77c72a561d333c14698bb5cd116fdcbd, type: 2}
-  <BaseProductionRate>k__BackingField: 8
-  <ProductionCount>k__BackingField: 16
   <Sprite>k__BackingField: {fileID: 21300000, guid: 65087a6ee9644ef4fab9e39f7f526d1e, type: 3}
+  <Name>k__BackingField: 
+  <ConnectedResource>k__BackingField: {fileID: 11400000, guid: 77c72a561d333c14698bb5cd116fdcbd, type: 2}
   <ProductionResource>k__BackingField: {fileID: 11400000, guid: 731fad6abcf8e2e42b5fdd07d98069bd, type: 2}
+  <BaseStats>k__BackingField:
+    autoProduction: 0
+    productionCount: 2
+    productionRate: 1

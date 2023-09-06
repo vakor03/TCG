@@ -1,19 +1,14 @@
-﻿using _Scripts.Core.Productions;
-using _Scripts.Factories;
+﻿using _Scripts.Factories;
 using _Scripts.Interactors;
 using _Scripts.Managers;
 using _Scripts.Managers.Shops;
 using _Scripts.Repositories;
-using _Scripts.UI;
-using UnityEngine;
 using Zenject;
 
 namespace _Scripts.DI.Installers
 {
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField] private ProductionUIContainerMB productionUIContainerMB;
-        [SerializeField] private OfflineIncomeUI offlineIncomeUI;
         public override void InstallBindings()
         {
             BindResourcesRepository();
@@ -21,16 +16,14 @@ namespace _Scripts.DI.Installers
 
             BindLastTimeOnlineRepository();
             BindLastTimeOnlineInteractor();
-            
+
             BindManagers();
 
-            BindFactories();
+            BindFactories(); 
 
             BindDatabases();
 
             BindShop();
-
-            BindOfflineIncomeUI();
         }
 
         private void BindDatabases()
@@ -41,8 +34,6 @@ namespace _Scripts.DI.Installers
 
         private void BindFactories()
         {
-            BindProductionUIFactory();
-
             BindProductionFactory();
         }
 
@@ -51,7 +42,7 @@ namespace _Scripts.DI.Installers
             BindShopOptionManager();
 
             BindOfflineIncomeManager();
-            
+
             BindSaveCoordinator();
         }
 
@@ -74,11 +65,6 @@ namespace _Scripts.DI.Installers
             Container
                 .Bind<SaveCoordinator>()
                 .AsSingle();
-        }
-
-        private void BindOfflineIncomeUI()
-        {
-            Container.BindInstance(offlineIncomeUI).AsSingle();
         }
 
         private void BindResourcesInteractor()
@@ -114,23 +100,11 @@ namespace _Scripts.DI.Installers
                 .AsSingle();
         }
 
-        private void BindProductionUIFactory()
-        {
-            Container
-                .BindInstance(productionUIContainerMB)
-                .AsSingle();
-
-            Container
-                .Bind<IProductionUIFactory>()
-                .To<ProductionUIFactory>()
-                .AsSingle();
-        }
-
         private void BindProductionDatabase()
         {
             Container
                 .BindInterfacesAndSelfTo<ProductionDatabase>()
-                .AsSingle();
+                .AsSingle().NonLazy();
         }
 
         private void BindShopOptionManager()

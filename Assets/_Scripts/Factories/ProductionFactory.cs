@@ -12,15 +12,10 @@ namespace _Scripts.Factories
         {
             _resourcesInteractor = resourcesInteractor;
         }
-
-        public Producer Create(ProductionStats productionStats,
-            ResourceSO productedResource,
-            ResourceSO connectedResource)
+        
+        public Producer Create(ProductionSO productionSO)
         {
-            return new Producer(productionStats,
-                productedResource,
-                connectedResource,
-                _resourcesInteractor);
+            return new Producer(productionSO, _resourcesInteractor);
         }
     }
 }

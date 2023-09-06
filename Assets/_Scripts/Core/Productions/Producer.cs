@@ -13,24 +13,25 @@ namespace _Scripts.Core.Productions
 {
     public class Producer : IProducer
     {
-        public ProductionStats BaseStats { get; }
-        public ProductionStats CurrentStats { get; private set; }
-        
         private Production _production;
         private List<IUpgrade> _upgrades = new();
-        
-        public Producer(ProductionStats baseStats,
-            ResourceSO productionResourceSO,
-            ResourceSO connectedResource,
-            ResourcesInteractor resourcesInteractor)
-        {
-            BaseStats = baseStats;
-            CurrentStats = BaseStats;
 
-            _production = new Production(this, productionResourceSO, connectedResource, resourcesInteractor);
+        public Producer(ProductionSO productionSO, ResourcesInteractor resourcesInteractor)
+        {
+            BaseStats = productionSO.BaseStats.ToProductionStats();
+            CurrentStats = BaseStats;
+            Name = productionSO.Name;
+            
+            _production = new Production(this, productionSO.ProductionResource, productionSO.ConnectedResource, resourcesInteractor);
             _production.OnStarted += () => { OnProductionStarted?.Invoke(); };
             _production.OnFinished += () => { OnProductionFinished?.Invoke(); };
         }
+
+
+        public string Name { get; }
+        public ProductionStats BaseStats { get; }
+        public ProductionStats CurrentStats { get; private set; }
+
 
         public void AddUpgrade(IUpgrade upgrade)
         {
@@ -53,8 +54,14 @@ namespace _Scripts.Core.Productions
         }
 
         public event Action OnStatsChanged;
+
+
         public void StartProduction()
         {
+            if (_production.IsRunning)
+            {
+                return;
+            }
             _production.StartProduction();
         }
 

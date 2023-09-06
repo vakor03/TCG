@@ -44,7 +44,7 @@ namespace _Scripts.UI
         public void Init(ProductionSO productionSO)
         {
             _productionSO = productionSO;
-            _producer = _productionDatabase.GetProduction(_productionSO);
+            _producer = _productionDatabase.GetProducer(_productionSO);
         }
 
         private void Start()

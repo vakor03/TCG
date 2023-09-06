@@ -14,10 +14,10 @@ namespace _Scripts.Core.Productions
     public class Production
     {
         private ResourceSO _connectedResourceSO;
-        private State _currentState;
         private IProducer _producer;
         private ResourceSO _productionResourceSO;
-        public ResourcesInteractor _resourcesInteractor;
+        private ResourcesInteractor _resourcesInteractor;
+        private bool _autoProduction;
 
         public Production(IProducer producer,
             ResourceSO productionResourceSO,
@@ -28,20 +28,59 @@ namespace _Scripts.Core.Productions
             _productionResourceSO = productionResourceSO;
             _connectedResourceSO = connectedResourceSO;
             _resourcesInteractor = resourcesInteractor;
+            
+            _producer.OnStatsChanged += ProducerOnStatsChanged;
         }
 
-        private bool IsRunning => _currentState == State.Running;
+        private void ProducerOnStatsChanged()
+        {
+            if (IsAutoProductionChanged())
+            {
+                ToggleAutoProduction();
+            }
+
+            bool IsAutoProductionChanged()
+            {
+                return _autoProduction != _producer.CurrentStats.AutoProduction;
+            }
+        }
+        
+        private void ToggleAutoProduction()
+        {
+            _autoProduction = !_autoProduction;
+
+            if (_autoProduction)
+            {
+                StartAutoProduction();
+            }
+            else
+            {
+                StopAutoProduction();
+            }
+        }
+
+        private void StopAutoProduction()
+        {
+            OnFinished -= StartOneTimeProductionCoroutine;
+        }
+
+        private void StartAutoProduction()
+        {
+            OnFinished += StartOneTimeProductionCoroutine;
+
+            if (!IsRunning)
+            {
+                StartOneTimeProductionCoroutine();
+            }
+        }
+
+        public bool IsRunning { get; private set; }
 
         public event Action OnStarted;
         public event Action OnFinished;
 
         public void StartProduction()
         {
-            if (IsRunning)
-            {
-                return;
-            }
-
             StartOneTimeProductionCoroutine();
         }
 
@@ -52,7 +91,7 @@ namespace _Scripts.Core.Productions
 
         private IEnumerator<float> OneTimeProductionCoroutine()
         {
-            _currentState = State.Running;
+           IsRunning = true;
             OnStarted?.Invoke();
 
             yield return Timing.WaitForSeconds(_producer.CurrentStats.ProductionRate);
@@ -60,19 +99,13 @@ namespace _Scripts.Core.Productions
             _resourcesInteractor.AddResource(_productionResourceSO, GetProductionCount());
 
             OnFinished?.Invoke();
-            _currentState = State.Stopped;
+            IsRunning = false;
         }
 
         private BigInteger GetProductionCount()
         {
             return _producer.CurrentStats.ProductionCount
                    * _resourcesInteractor.GetResourceQuantity(_connectedResourceSO);
-        }
-
-        private enum State
-        {
-            Stopped,
-            Running,
         }
     }
 }

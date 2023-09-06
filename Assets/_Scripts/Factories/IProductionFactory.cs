@@ -5,8 +5,6 @@ namespace _Scripts.Factories
 {
     public interface IProductionFactory
     {
-        Producer Create(ProductionStats productionStats,
-            ResourceSO productedResource,
-            ResourceSO connectedResource);
+        Producer Create(ProductionSO productionSO);
     }
 }
