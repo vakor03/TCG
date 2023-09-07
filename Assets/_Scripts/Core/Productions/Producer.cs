@@ -53,6 +53,13 @@ namespace _Scripts.Core.Productions
             LogStatsUpdated();
         }
 
+        public void RecalculateStats()
+        {
+            UpdateProductionStats();
+
+            OnStatsChanged?.Invoke();
+        }
+
         public event Action OnStatsChanged;
 
 

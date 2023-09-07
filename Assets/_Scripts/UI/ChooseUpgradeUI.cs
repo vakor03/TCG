@@ -28,10 +28,12 @@ namespace _Scripts.UI
             applyAutomationUpdateButton.onClick.AddListener(()=>ApplyUpgrade(new AutomationUpgrade()));
             applyRateUpdateButton.onClick.AddListener(()=>ApplyUpgrade(new ProductionRateUpgrade(2)));
             applyCountUpdateButton.onClick.AddListener(()=>ApplyUpgrade(new ProductionCountUpgrade(2)));
+            applyCountUpdateButton.onClick.AddListener(()=>ApplyUpgrade(new ProductionCountUpgrade(2)));
             
             Initialize();
         }
         
+        private List<IHaveLevel> _haveLevels = new();
         private void ApplyUpgrade(IUpgrade upgrade)
         {
             if (!producerDropdownHandler.IsItemSelected)
@@ -39,8 +41,24 @@ namespace _Scripts.UI
                 return;
             }
 
+            if (upgrade is IHaveLevel haveLevel)
+            {
+                _haveLevels.Add(haveLevel);
+            }
+            
             producerDropdownHandler.SelectedItem
                 .AddUpgrade(upgrade);
+        }
+        
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                foreach (var haveLevel in _haveLevels)
+                {
+                    haveLevel.ChangeLevel(haveLevel.Level + 1);
+                }
+            }
         }
 
         [Inject]

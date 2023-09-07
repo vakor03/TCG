@@ -4,5 +4,6 @@
     {
         void AddUpgrade(IUpgrade upgrade);
         void RemoveUpgrade(IUpgrade upgrade);
+        void RecalculateStats();
     }
 }
